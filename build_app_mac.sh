@@ -104,12 +104,12 @@ $JAVA_HOME/bin/jpackage \
 --type $INSTALLER_TYPE \
 --dest target/installer \
 --input target/installer/input \
---name Palladium \
---main-class io.github.ppetrbednar.palladium.AppLauncher \
+--name DSTR \
+--main-class io.github.ppetrbednar.dstr.AppLauncher \
 --main-jar ${MAIN_JAR} \
 --java-options -Xmx2048m \
 --runtime-image target/java-runtime \
---icon src/main/logo/windows/Palladium.ico \
+--icon src/main/resources/io/github/ppetrbednar/dstr/logo/windows/icon.ico \
 --app-version ${APP_VERSION} \
 --vendor "Petrexis" \
 --copyright "Copyright © 2022 Petrexis" \

@@ -4,7 +4,7 @@ package io.github.ppetrbednar.dstr.resources;
  * @author Petr Bednář
  */
 public enum Resource {
-    APPLICATION_ICON("./app/res/palladium_icon.png", ResourceType.IMAGE, true),
+    APPLICATION_ICON("./app/res/icon.png", ResourceType.IMAGE, true),
     CONFIG_FILE("./app/conf/conf.json", ResourceType.FILE, false);
 
 
