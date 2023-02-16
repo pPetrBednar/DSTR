@@ -1,8 +1,10 @@
 package io.github.ppetrbednar.dstr.ui;
 
+import io.github.ppetrbednar.dstr.logic.DSTRController;
 import io.github.ppetrbednar.dstr.ui.handler.*;
 import io.github.ppetrbednar.dstr.ui.module.panel.RootBar;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;

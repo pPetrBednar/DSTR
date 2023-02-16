@@ -1,38 +1,32 @@
 package io.github.ppetrbednar.dstr.logic.structures;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public class Vertex<K, V, E> {
-    private K key;
-    private V value;
-    private List<Edge<K, V, E>> connections;
+public class Vertex {
+    private final String key;
+    private final List<Edge> connections;
+    private final DijkstraTemporaryValues values;
 
-    public Vertex(K key, V value) {
+    public Vertex(String key) {
         this.key = key;
-        this.value = value;
+        connections = new LinkedList<>();
+        values = new DijkstraTemporaryValues();
     }
 
-    public V getValue() {
-        return value;
+    public void clear() {
+        connections.clear();
     }
 
-    public void setValue(V value) {
-        this.value = value;
-    }
-
-    public K getKey() {
+    public String getKey() {
         return key;
     }
 
-    public void setKey(K key) {
-        this.key = key;
-    }
-
-    public List<Edge<K, V, E>> getConnections() {
+    public List<Edge> getConnections() {
         return connections;
     }
 
-    public void setConnections(List<Edge<K, V, E>> connections) {
-        this.connections = connections;
+    public DijkstraTemporaryValues getValues() {
+        return values;
     }
 }

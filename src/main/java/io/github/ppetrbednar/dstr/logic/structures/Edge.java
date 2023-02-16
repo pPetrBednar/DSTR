@@ -1,57 +1,25 @@
 package io.github.ppetrbednar.dstr.logic.structures;
 
-public class Edge<K, V, E> {
-    private K key;
-    private Vertex<K, V, E> left;
-    private Vertex<K, V, E> right;
-    private E value;
+public class Edge {
+    private final String key;
+    private Vertex left;
+    private Vertex right;
+    private int weight;
 
-    public Edge(K key, E value) {
+    public Edge(String key) {
         this.key = key;
-        this.value = value;
     }
 
-    public Edge(K key, Vertex<K, V, E> left, Vertex<K, V, E> right, E value) {
+    public Edge(String key, Vertex left, Vertex right, int weight) {
         this.key = key;
         this.left = left;
-        left.getConnections().add(this);
         this.right = right;
-        right.getConnections().add(this);
-        this.value = value;
-    }
-
-    public Vertex<K, V, E> getLeft() {
-        return left;
-    }
-
-    public Vertex<K, V, E> getRight() {
-        return right;
-    }
-
-    public void setLink(Vertex<K, V, E> left, Vertex<K, V, E> right) {
-        this.left = left;
+        this.weight = weight;
         left.getConnections().add(this);
-        this.right = right;
         right.getConnections().add(this);
     }
 
-    public E getValue() {
-        return value;
-    }
-
-    public void setValue(E value) {
-        this.value = value;
-    }
-
-    public K getKey() {
-        return key;
-    }
-
-    public void setKey(K key) {
-        this.key = key;
-    }
-
-    public void clear(Vertex<K, V, E> vertex) {
+    public void clear(Vertex vertex) {
         (vertex == left ? right : left).getConnections().remove(this);
         left = right = null;
     }
@@ -60,5 +28,21 @@ public class Edge<K, V, E> {
         left.getConnections().remove(this);
         right.getConnections().remove(this);
         left = right = null;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public Vertex getLeft() {
+        return left;
+    }
+
+    public Vertex getRight() {
+        return right;
+    }
+
+    public int getWeight() {
+        return weight;
     }
 }

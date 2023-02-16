@@ -1,10 +1,16 @@
 package io.github.ppetrbednar.dstr.logic.structures;
 
 import java.util.HashMap;
+import java.util.Map;
 
-public class Graph<K, V, E> implements SuperADTGraph<K, V, E> {
-    private HashMap<K, Vertex<K, V, E>> vertices;
-    private HashMap<K, Edge<K, V, E>> edges;
+public class Graph implements IGraph {
+    private HashMap<String, Vertex> vertices;
+    private HashMap<String, Edge> edges;
+
+    public Graph() {
+        vertices = new HashMap<>();
+        edges = new HashMap<>();
+    }
 
     @Override
     public void clear() {
@@ -23,19 +29,18 @@ public class Graph<K, V, E> implements SuperADTGraph<K, V, E> {
     }
 
     @Override
-    public void addVertex(K key, Vertex<K, V, E> vertex) {
-        vertices.put(key, vertex);
+    public void addVertex(Vertex vertex) {
+        vertices.put(vertex.getKey(), vertex);
     }
 
     @Override
-    public void addEdge(K edgeKey, Edge<K, V, E> edge, K vertexKeyLeft, K vertexKeyRight) {
-        edge.setLink(vertices.get(vertexKeyLeft), vertices.get(vertexKeyRight));
-        edges.put(edgeKey, edge);
+    public void addEdge(Edge edge) {
+        edges.put(edge.getKey(), edge);
     }
 
     @Override
-    public Vertex<K, V, E> removeVertex(K key) {
-        Vertex<K, V, E> vertex = vertices.remove(key);
+    public Vertex removeVertex(String key) {
+        Vertex vertex = vertices.remove(key);
         vertex.getConnections().forEach(edge -> {
             edges.remove(edge.getKey()).clear(vertex);
         });
@@ -43,19 +48,29 @@ public class Graph<K, V, E> implements SuperADTGraph<K, V, E> {
     }
 
     @Override
-    public Edge<K, V, E> removeEdge(K key) {
-        Edge<K, V, E> edge = edges.remove(key);
+    public Edge removeEdge(String key) {
+        Edge edge = edges.remove(key);
         edge.clear();
         return edge;
     }
 
     @Override
-    public Vertex<K, V, E> getVertex(K key) {
+    public Vertex getVertex(String key) {
         return vertices.get(key);
     }
 
     @Override
-    public Edge<K, V, E> getEdge(K key) {
+    public Edge getEdge(String key) {
         return edges.get(key);
+    }
+
+    @Override
+    public Map<String, Vertex> getVertices() {
+        return vertices;
+    }
+
+    @Override
+    public Map<String, Edge> getEdges() {
+        return edges;
     }
 }
