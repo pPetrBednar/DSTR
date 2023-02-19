@@ -1,17 +1,19 @@
 package io.github.ppetrbednar.dstr.logic.structures;
 
+import javafx.util.Pair;
+
 import java.util.LinkedList;
 import java.util.List;
 
 public class Vertex {
     private final String key;
     private final List<Edge> connections;
-    private final DijkstraTemporaryValues values;
+    private final Pathfinder values;
 
     public Vertex(String key) {
         this.key = key;
         connections = new LinkedList<>();
-        values = new DijkstraTemporaryValues();
+        values = new Pathfinder();
     }
 
     public void clear() {
@@ -26,7 +28,7 @@ public class Vertex {
         return connections;
     }
 
-    public DijkstraTemporaryValues getValues() {
+    public Pathfinder getValues() {
         return values;
     }
 }

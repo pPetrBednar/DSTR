@@ -6,8 +6,19 @@ public class Edge {
     private Vertex right;
     private int weight;
 
-    public Edge(String key) {
+    public Edge(String key, int weight) {
         this.key = key;
+        this.weight = weight;
+    }
+
+    public void setLeft(Vertex left) {
+        this.left = left;
+        left.getConnections().add(this);
+    }
+
+    public void setRight(Vertex right) {
+        this.right = right;
+        right.getConnections().add(this);
     }
 
     public Edge(String key, Vertex left, Vertex right, int weight) {
@@ -28,6 +39,10 @@ public class Edge {
         left.getConnections().remove(this);
         right.getConnections().remove(this);
         left = right = null;
+    }
+
+    public Vertex getNext(Vertex current) {
+        return left == current ? right : left;
     }
 
     public String getKey() {

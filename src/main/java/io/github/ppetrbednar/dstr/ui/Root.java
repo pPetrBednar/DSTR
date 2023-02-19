@@ -3,6 +3,7 @@ package io.github.ppetrbednar.dstr.ui;
 import io.github.ppetrbednar.dstr.logic.DSTRController;
 import io.github.ppetrbednar.dstr.ui.handler.*;
 import io.github.ppetrbednar.dstr.ui.module.panel.RootBar;
+import io.github.ppetrbednar.dstr.ui.module.root.Main;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -96,6 +97,7 @@ public class Root extends Screen<Root> implements Initializable {
         private void composeHomePage() {
             mainContainer.setTop(modules.get(ViewType.ROOT_BAR).getContent());
             box.setCenter(modules.get(ViewType.HOME_PAGE).getContent());
+            ((Main) modules.get(ViewType.HOME_PAGE).getController()).compose(ViewType.DEFAULT);
         }
     }
 

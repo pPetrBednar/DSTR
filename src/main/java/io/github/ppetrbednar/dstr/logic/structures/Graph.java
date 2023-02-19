@@ -39,6 +39,13 @@ public class Graph implements IGraph {
     }
 
     @Override
+    public void addEdge(Edge edge, String leftVertexKey, String rightVertexKey) {
+        edge.setLeft(vertices.get(leftVertexKey));
+        edge.setRight(vertices.get(rightVertexKey));
+        edges.put(edge.getKey(), edge);
+    }
+
+    @Override
     public Vertex removeVertex(String key) {
         Vertex vertex = vertices.remove(key);
         vertex.getConnections().forEach(edge -> {
