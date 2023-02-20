@@ -1,6 +1,6 @@
 package io.github.ppetrbednar.dstr.logic.structures;
 
-import javafx.util.Pair;
+import io.github.ppetrbednar.dstr.logic.railway.Pathfinder;
 
 import java.util.LinkedList;
 import java.util.List;

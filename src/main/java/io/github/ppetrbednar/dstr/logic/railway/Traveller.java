@@ -1,4 +1,9 @@
-package io.github.ppetrbednar.dstr.logic.structures;
+package io.github.ppetrbednar.dstr.logic.railway;
+
+import io.github.ppetrbednar.dstr.logic.structures.Direction;
+import io.github.ppetrbednar.dstr.logic.structures.Edge;
+import io.github.ppetrbednar.dstr.logic.structures.Graph;
+import io.github.ppetrbednar.dstr.logic.structures.Vertex;
 
 import java.util.*;
 

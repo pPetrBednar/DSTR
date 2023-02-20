@@ -1,4 +1,6 @@
-package io.github.ppetrbednar.dstr.logic.structures;
+package io.github.ppetrbednar.dstr.logic.railway;
+
+import io.github.ppetrbednar.dstr.logic.structures.Edge;
 
 public class IllegalTransition {
     private final Edge left;

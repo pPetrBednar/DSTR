@@ -28,22 +28,3 @@ public interface IGraph {
     Map<String, Edge> getEdges();
 }
 
-   /* Vytvoř
-            Zruš
-    JePrázdný (­Boolean)
-    Mohutnost (­PočetPrvků)
-    Prohlídka(ØTyp, ØPočátek, ØAkce) vrcholová/hranová, do hloubky/šířky
-    VložVrchol(ØVrchol)
-    VložHranu(ØHrana)
-    OdeberVrchol(ØKlíč, ­Vrchol)
-    OdeberHranu(ØKlíč, ­Hrana)
-    NajdiVrchol (ØKlíč, ­Vrchol)
-    NajdiHranu(ØKlíč, ­Hrana)
-    ZpřístupniNásledníky(ØKoho,­Prvky)
-    ZpřístupniPředchůdce(ØKoho,­Prvky)
-    ZpřístupniIncidenčníPrvky(ØKoho,­Prvky)
-    DefinujBránu(ØPrvek)
-    AnulujBránu(ØPrvek)
-    ZpřístupniBrány(­Prvky)
-B. Sjednocení (ØGrafA, ØGrafB, ­GrafC)+*/
-

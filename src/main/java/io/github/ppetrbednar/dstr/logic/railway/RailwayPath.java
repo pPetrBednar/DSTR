@@ -1,4 +1,7 @@
-package io.github.ppetrbednar.dstr.logic.structures;
+package io.github.ppetrbednar.dstr.logic.railway;
+
+import io.github.ppetrbednar.dstr.logic.structures.Direction;
+import io.github.ppetrbednar.dstr.logic.structures.Vertex;
 
 import java.util.Comparator;
 import java.util.HashMap;

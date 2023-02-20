@@ -1,10 +1,9 @@
 package io.github.ppetrbednar.dstr.logic;
 
+import io.github.ppetrbednar.dstr.logic.railway.IllegalTransition;
+import io.github.ppetrbednar.dstr.logic.railway.Pathfinder;
+import io.github.ppetrbednar.dstr.logic.railway.RailwayPath;
 import io.github.ppetrbednar.dstr.logic.structures.*;
-
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Set;
 
 public class DSTRController {
     public static void test() {
