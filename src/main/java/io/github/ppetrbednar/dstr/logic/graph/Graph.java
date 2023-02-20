@@ -1,11 +1,11 @@
-package io.github.ppetrbednar.dstr.logic.structures;
+package io.github.ppetrbednar.dstr.logic.graph;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Graph implements IGraph {
-    private HashMap<String, Vertex> vertices;
-    private HashMap<String, Edge> edges;
+public class Graph<K, V extends Comparable<V>, E extends Comparable<E>> implements IGraph<K, V, E> {
+    private HashMap<K, Vertex<K, V, E>> vertices;
+    private HashMap<K, Edge<K, V, E>> edges;
 
     public Graph() {
         vertices = new HashMap<>();
@@ -29,25 +29,26 @@ public class Graph implements IGraph {
     }
 
     @Override
-    public void addVertex(Vertex vertex) {
+    public void addVertex(Vertex<K, V, E> vertex) {
         vertices.put(vertex.getKey(), vertex);
     }
 
     @Override
-    public void addEdge(Edge edge) {
+    public void addEdge(K edgeKey, K leftVertexKey, K rightVertexKey, E value) {
+        var left = getVertex(leftVertexKey);
+        var right = getVertex(rightVertexKey);
+
+        edges.put(edgeKey, new Edge<>(edgeKey, left, right, value));
+    }
+
+    @Override
+    public void addEdge(Edge<K, V, E> edge) {
         edges.put(edge.getKey(), edge);
     }
 
     @Override
-    public void addEdge(Edge edge, String leftVertexKey, String rightVertexKey) {
-        edge.setLeft(vertices.get(leftVertexKey));
-        edge.setRight(vertices.get(rightVertexKey));
-        edges.put(edge.getKey(), edge);
-    }
-
-    @Override
-    public Vertex removeVertex(String key) {
-        Vertex vertex = vertices.remove(key);
+    public Vertex<K, V, E> removeVertex(K key) {
+        var vertex = vertices.remove(key);
         vertex.getConnections().forEach(edge -> {
             edges.remove(edge.getKey()).clear(vertex);
         });
@@ -55,29 +56,29 @@ public class Graph implements IGraph {
     }
 
     @Override
-    public Edge removeEdge(String key) {
-        Edge edge = edges.remove(key);
+    public Edge<K, V, E> removeEdge(K key) {
+        var edge = edges.remove(key);
         edge.clear();
         return edge;
     }
 
     @Override
-    public Vertex getVertex(String key) {
+    public Vertex<K, V, E> getVertex(K key) {
         return vertices.get(key);
     }
 
     @Override
-    public Edge getEdge(String key) {
+    public Edge<K, V, E> getEdge(K key) {
         return edges.get(key);
     }
 
     @Override
-    public Map<String, Vertex> getVertices() {
+    public Map<K, Vertex<K, V, E>> getVertices() {
         return vertices;
     }
 
     @Override
-    public Map<String, Edge> getEdges() {
+    public Map<K, Edge<K, V, E>> getEdges() {
         return edges;
     }
 }
