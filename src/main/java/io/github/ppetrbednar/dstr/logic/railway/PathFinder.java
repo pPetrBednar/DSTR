@@ -1,8 +1,6 @@
 package io.github.ppetrbednar.dstr.logic.railway;
 
-import io.github.ppetrbednar.dstr.logic.graph.Edge;
 import io.github.ppetrbednar.dstr.logic.graph.Graph;
-import io.github.ppetrbednar.dstr.logic.graph.Vertex;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.NoPathFoundException;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Direction;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Rail;
@@ -13,13 +11,12 @@ import java.util.*;
 
 public class PathFinder {
 
-    public static void calculateShortestPathFromSource(Graph<String, Switch, Rail> graph, Vertex<String, Switch, Rail> source) {
-        clearGraph(graph);
-        graph.getVertices().values().forEach(vertex -> vertex.getValue().clear());
-        source.getValue().setDistance(0);
+    public static void calculateShortestPathFromSource(Graph<String, Switch, String, Rail> graph, Switch source) {
+        graph.getVertexValues().values().forEach(Switch::clear);
+        source.setDistance(0);
 
-        Set<Vertex<String, Switch, Rail>> settledVertices = new HashSet<>();
-        PriorityQueue<Vertex<String, Switch, Rail>> unsettledVertices = new PriorityQueue<>();
+        Set<Switch> settledVertices = new HashSet<>();
+        PriorityQueue<Switch> unsettledVertices = new PriorityQueue<>();
 
         unsettledVertices.add(source);
 
@@ -27,10 +24,10 @@ public class PathFinder {
             var current = unsettledVertices.poll();
             unsettledVertices.remove(current);
 
-            for (Edge<String, Switch, Rail> edge : current.getConnections()) {
-                var adjacent = edge.getLeft() == current ? edge.getRight() : edge.getLeft();
+            for (Rail rail : current.getConnections()) {
+                var adjacent = graph.getVertexValue(rail.left().equals(current.getKey()) ? rail.right() : rail.left());
                 if (!settledVertices.contains(adjacent)) {
-                    calculateMinimumDistance(current, edge, adjacent);
+                    calculateMinimumDistance(current, rail, adjacent);
                     unsettledVertices.add(adjacent);
                 }
             }
@@ -38,28 +35,22 @@ public class PathFinder {
         }
     }
 
-    private static void calculateMinimumDistance(Vertex<String, Switch, Rail> source, Edge<String, Switch, Rail> edge, Vertex<String, Switch, Rail> adjacent) {
+    private static void calculateMinimumDistance(Switch source, Rail rail, Switch adjacent) {
 
-        int distance = source.getValue().getDistance();
+        int distance = source.getDistance();
 
-        if (distance + edge.getValue().length() < adjacent.getValue().getDistance()) {
-            adjacent.getValue().setDistance(distance + edge.getValue().length());
-            adjacent.getValue().getShortestPath().clear();
-            adjacent.getValue().getShortestPath().addAll(source.getValue().getShortestPath());
-            adjacent.getValue().getShortestPath().add(new Direction(edge, source));
+        if (distance + rail.length() < adjacent.getDistance()) {
+            adjacent.setDistance(distance + rail.length());
+            adjacent.getShortestPath().clear();
+            adjacent.getShortestPath().addAll(source.getShortestPath());
+            adjacent.getShortestPath().add(new Direction(rail, source));
         }
     }
 
-    private static void clearGraph(Graph<String, Switch, Rail> graph) {
-        graph.getVertices().forEach((s, vertex) -> {
-            vertex.getValue().clear();
-        });
-    }
-
-    private static RailwayPath getShortestValidPath(Graph<String, Switch, Rail> graph, Vertex<String, Switch, Rail> source, Vertex<String, Switch, Rail> target, int length) throws NoPathFoundException {
+    private static RailwayPath getShortestValidPath(Graph<String, Switch, String, Rail> graph, Switch source, Switch target, int length) throws NoPathFoundException {
         calculateShortestPathFromSource(graph, source);
 
-        if (target.getValue().getShortestPath().isEmpty()) {
+        if (target.getShortestPath().isEmpty()) {
             throw new NoPathFoundException();
         }
 
@@ -77,7 +68,7 @@ public class PathFinder {
         return new RailwayPath(path, traveller.getReversalPaths());
     }
 
-    public static RailwayPath getShortestValidPath(Graph<String, Switch, Rail> graph, String sourceKey, String targetKey, int length) throws NoPathFoundException {
-        return getShortestValidPath(graph, graph.getVertex(sourceKey), graph.getVertex(targetKey), length);
+    public static RailwayPath getShortestValidPath(Graph<String, Switch, String, Rail> graph, String sourceKey, String targetKey, int length) throws NoPathFoundException {
+        return getShortestValidPath(graph, graph.getVertexValue(sourceKey), graph.getVertexValue(targetKey), length);
     }
 }

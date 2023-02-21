@@ -2,10 +2,90 @@ package io.github.ppetrbednar.dstr.logic.graph;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
 
-public class Graph<K, V extends Comparable<V>, E extends Comparable<E>> implements IGraph<K, V, E> {
-    private HashMap<K, Vertex<K, V, E>> vertices;
-    private HashMap<K, Edge<K, V, E>> edges;
+public class Graph<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>> implements IGraph<VK, VV, EK, EV> {
+    public class Edge<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>> implements Comparable<Edge<VK, VV, EK, EV>> {
+        private final EK key;
+        private final Vertex<VK, VV, EK, EV> left;
+        private final Vertex<VK, VV, EK, EV> right;
+        private final EV value;
+
+        public Edge(EK key, Vertex<VK, VV, EK, EV> left, Vertex<VK, VV, EK, EV> right, EV value) {
+            this.key = key;
+            this.left = left;
+            this.right = right;
+            this.value = value;
+            left.getConnections().add(this);
+            right.getConnections().add(this);
+        }
+
+        public void clear(Vertex<VK, VV, EK, EV> vertex) {
+            (vertex == left ? right : left).getConnections().remove(this);
+        }
+
+        public void clear() {
+            left.getConnections().remove(this);
+            right.getConnections().remove(this);
+        }
+
+        public EK getKey() {
+            return key;
+        }
+
+        public Vertex<VK, VV, EK, EV> getLeft() {
+            return left;
+        }
+
+        public Vertex<VK, VV, EK, EV> getRight() {
+            return right;
+        }
+
+        public EV getValue() {
+            return value;
+        }
+
+        @Override
+        public int compareTo(Edge<VK, VV, EK, EV> o) {
+            return value.compareTo(o.getValue());
+        }
+    }
+
+    public class Vertex<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>> implements Comparable<Vertex<VK, VV, EK, EV>> {
+        private final VK key;
+        private final PriorityQueue<Edge<VK, VV, EK, EV>> connections;
+        private final VV value;
+
+        public Vertex(VK key, VV value) {
+            this.key = key;
+            this.value = value;
+            connections = new PriorityQueue<>();
+        }
+
+        public void clear() {
+            connections.clear();
+        }
+
+        public VK getKey() {
+            return key;
+        }
+
+        public PriorityQueue<Edge<VK, VV, EK, EV>> getConnections() {
+            return connections;
+        }
+
+        public VV getValue() {
+            return value;
+        }
+
+        @Override
+        public int compareTo(Vertex<VK, VV, EK, EV> o) {
+            return value.compareTo(o.getValue());
+        }
+    }
+
+    private final HashMap<VK, Vertex<VK, VV, EK, EV>> vertices;
+    private final HashMap<EK, Edge<VK, VV, EK, EV>> edges;
 
     public Graph() {
         vertices = new HashMap<>();
@@ -29,56 +109,54 @@ public class Graph<K, V extends Comparable<V>, E extends Comparable<E>> implemen
     }
 
     @Override
-    public void addVertex(Vertex<K, V, E> vertex) {
-        vertices.put(vertex.getKey(), vertex);
+    public void addVertex(VK key, VV value) {
+        vertices.put(key, new Vertex<>(key, value));
     }
 
     @Override
-    public void addEdge(K edgeKey, K leftVertexKey, K rightVertexKey, E value) {
-        var left = getVertex(leftVertexKey);
-        var right = getVertex(rightVertexKey);
-
-        edges.put(edgeKey, new Edge<>(edgeKey, left, right, value));
+    public void addEdge(EK key, VK left, VK right, EV value) {
+        edges.put(key, new Edge<>(key, vertices.get(left), vertices.get(right), value));
     }
 
     @Override
-    public void addEdge(Edge<K, V, E> edge) {
-        edges.put(edge.getKey(), edge);
-    }
-
-    @Override
-    public Vertex<K, V, E> removeVertex(K key) {
+    public void removeVertex(VK key) {
         var vertex = vertices.remove(key);
         vertex.getConnections().forEach(edge -> {
             edges.remove(edge.getKey()).clear(vertex);
         });
-        return vertex;
     }
 
     @Override
-    public Edge<K, V, E> removeEdge(K key) {
+    public void removeEdge(EK key) {
         var edge = edges.remove(key);
         edge.clear();
-        return edge;
     }
 
     @Override
-    public Vertex<K, V, E> getVertex(K key) {
-        return vertices.get(key);
+    public VV getVertexValue(VK key) {
+        return vertices.get(key).getValue();
     }
 
     @Override
-    public Edge<K, V, E> getEdge(K key) {
-        return edges.get(key);
+    public EV getEdgeValue(EK key) {
+        return edges.get(key).getValue();
     }
 
     @Override
-    public Map<K, Vertex<K, V, E>> getVertices() {
-        return vertices;
+    public Map<VK, VV> getVertexValues() {
+        HashMap<VK, VV> output = new HashMap<>();
+        vertices.forEach((key, vertex) -> {
+            output.put(key, vertex.getValue());
+        });
+        return output;
     }
 
     @Override
-    public Map<K, Edge<K, V, E>> getEdges() {
-        return edges;
+    public Map<EK, EV> getEdgeValues() {
+        HashMap<EK, EV> output = new HashMap<>();
+        edges.forEach((key, edge) -> {
+            output.put(key, edge.getValue());
+        });
+        return output;
     }
 }

@@ -1,8 +1,6 @@
 package io.github.ppetrbednar.dstr.logic.railway;
 
-import io.github.ppetrbednar.dstr.logic.graph.Edge;
 import io.github.ppetrbednar.dstr.logic.graph.Graph;
-import io.github.ppetrbednar.dstr.logic.graph.Vertex;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.NoPossiblePathException;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Direction;
 import io.github.ppetrbednar.dstr.logic.railway.structures.IllegalTransition;
@@ -12,18 +10,18 @@ import io.github.ppetrbednar.dstr.logic.railway.structures.Switch;
 import java.util.*;
 
 public class Traveller {
-    private Graph<String, Switch, Rail> graph;
-    private Vertex<String, Switch, Rail> source;
-    private Vertex<String, Switch, Rail> target;
+    private Graph<String, Switch, String, Rail> graph;
+    private Switch source;
+    private Switch target;
     private Stack<Direction> traversedPath;
-    private HashMap<Edge<String, Switch, Rail>, Direction> bannedDirections;
-    private HashMap<Vertex<String, Switch, Rail>, LinkedList<Direction>> reversalPaths;
-    private Vertex<String, Switch, Rail> position;
+    private HashMap<Rail, Direction> bannedDirections;
+    private HashMap<Switch, LinkedList<Direction>> reversalPaths;
+    private Switch position;
     private Direction planned;
     private boolean searchingNewPath;
     private final int length;
 
-    public Traveller(Graph<String, Switch, Rail> graph, Vertex<String, Switch, Rail> source, Vertex<String, Switch, Rail> target, int length) {
+    public Traveller(Graph<String, Switch, String, Rail> graph, Switch source, Switch target, int length) {
         this.graph = graph;
         this.source = source;
         this.target = target;
@@ -53,7 +51,7 @@ public class Traveller {
                     planned = findValidDirectionByDijkstra();
                 }
 
-                if (!checkIfDirectionValid(traversedPath.isEmpty() ? null : traversedPath.peek().edge(), position, planned.edge())
+                if (!checkIfDirectionValid(traversedPath.isEmpty() ? null : traversedPath.peek().rail(), position, planned.rail())
                         && !reversalPathFound()) {
                     continue;
                 }
@@ -71,15 +69,15 @@ public class Traveller {
         return traversedPath;
     }
 
-    public HashMap<Vertex<String, Switch, Rail>, LinkedList<Direction>> getReversalPaths() {
+    public HashMap<Switch, LinkedList<Direction>> getReversalPaths() {
         return reversalPaths;
     }
 
     private boolean reversalPathFound() throws NoPossiblePathException {
         LinkedList<Direction> reversalPath = findReversalPath();
         if (reversalPath == null) {
-            if (anyValidPathsExceptLast(planned.edge())) {
-                bannedDirections.put(planned.edge(), planned);
+            if (anyValidPathsExceptLast(planned.rail())) {
+                bannedDirections.put(planned.rail(), planned);
                 searchingNewPath = true;
             } else {
                 backtrackingStep();
@@ -102,13 +100,13 @@ public class Traveller {
 
         for (Direction direction : directions) {
             reversalPath.clear();
-            if (distance + direction.edge().getValue().length() >= length) {
+            if (distance + direction.rail().length() >= length) {
                 reversalPath.add(direction);
                 return reversalPath;
             }
 
             reversalPath.add(direction);
-            LinkedList<Direction> newPath = findReversalPath(new LinkedList<>(reversalPath), direction, distance + direction.edge().getValue().length());
+            LinkedList<Direction> newPath = findReversalPath(new LinkedList<>(reversalPath), direction, distance + direction.rail().length());
             if (newPath != null) {
                 return newPath;
             }
@@ -121,13 +119,13 @@ public class Traveller {
         Collections.reverse(directions);
 
         for (Direction direction : directions) {
-            if (distance + direction.edge().getValue().length() >= length) {
+            if (distance + direction.rail().length() >= length) {
                 reversalPath.add(direction);
                 return reversalPath;
             }
             LinkedList<Direction> reversalPathLast = new LinkedList<>(reversalPath);
             reversalPathLast.add(direction);
-            LinkedList<Direction> newPath = findReversalPath(reversalPathLast, direction, distance + direction.edge().getValue().length());
+            LinkedList<Direction> newPath = findReversalPath(reversalPathLast, direction, distance + direction.rail().length());
             if (newPath != null) {
                 return newPath;
             }
@@ -145,20 +143,20 @@ public class Traveller {
 
             lastPlanned = planned;
             backtrackingStep();
-            if (anyValidPathsExceptLast(lastPlanned.edge())) {
-                bannedDirections.put(lastPlanned.edge(), lastPlanned);
+            if (anyValidPathsExceptLast(lastPlanned.rail())) {
+                bannedDirections.put(lastPlanned.rail(), lastPlanned);
                 return;
             }
         }
     }
 
-    private boolean anyValidPathsExceptLast(Edge<String, Switch, Rail> invalidEdge) {
-        for (var edge : position.getConnections()) {
-            if (edge == invalidEdge || edge == getLastCrossedEdgeOrNull()) {
+    private boolean anyValidPathsExceptLast(Rail invalidRail) {
+        for (var rail : position.getConnections()) {
+            if (rail == invalidRail || rail == getLastCrossedEdgeOrNull()) {
                 continue;
             }
 
-            if (bannedDirections.get(edge) == null || !edge.equals(bannedDirections.get(edge).edge())) {
+            if (bannedDirections.get(rail) == null || !rail.equals(bannedDirections.get(rail).rail())) {
                 return true;
             }
         }
@@ -177,31 +175,31 @@ public class Traveller {
 
     private void step() {
         traversedPath.push(planned);
-        position = planned.vertex();
+        position = planned.point();
     }
 
     private Direction findValidDirectionByDijkstra() {
-        return position.getValue().getShortestPath().getLast();
+        return position.getShortestPath().getLast();
     }
 
     private Direction findShortestValidDirection() {
         var connections = position.getConnections();
 
-        for (Edge<String, Switch, Rail> edge : connections) {
-            if (edge == getLastCrossedEdgeOrNull()) {
+        for (Rail rail : connections) {
+            if (rail == getLastCrossedEdgeOrNull()) {
                 continue;
             }
-            if (bannedDirections.get(edge) != null && bannedDirections.get(edge).vertex() == edge.getNext(position)) {
+            if (bannedDirections.get(rail) != null && bannedDirections.get(rail).point().getKey().equals(rail.getNext(position))) {
                 continue;
             }
 
-            var path = edge.getNext(position).getValue().getShortestPath();
-            var potentiallyBanned = path.get(path.size() - 2).edge();
+            var path = graph.getVertexValue(rail.getNext(position)).getShortestPath();
+            var potentiallyBanned = path.get(path.size() - 2).rail();
             if (bannedDirections.get(potentiallyBanned) != null) {
                 continue;
             }
 
-            return new Direction(edge, edge.getNext(position));
+            return new Direction(rail, graph.getVertexValue(rail.getNext(position)));
         }
         return null;
     }
@@ -210,33 +208,33 @@ public class Traveller {
         LinkedList<Direction> directions = new LinkedList<>();
         var connections = position.getConnections();
 
-        for (var edge : connections) {
-            if (edge != getLastCrossedEdgeOrNull() && edge != planned.edge()) {
-                directions.add(new Direction(edge, edge.getNext(position)));
+        for (var rail : connections) {
+            if (rail != getLastCrossedEdgeOrNull() && rail != planned.rail()) {
+                directions.add(new Direction(rail, graph.getVertexValue(rail.getNext(position))));
             }
         }
         return directions;
     }
 
-    private Edge<String, Switch, Rail> getLastCrossedEdgeOrNull() {
-        return traversedPath.isEmpty() ? null : traversedPath.peek().edge();
+    private Rail getLastCrossedEdgeOrNull() {
+        return traversedPath.isEmpty() ? null : traversedPath.peek().rail();
     }
 
     private LinkedList<Direction> findShortestValidDirections(Direction current) {
         LinkedList<Direction> directions = new LinkedList<>();
 
-        for (var edge : current.vertex().getConnections()) {
-            if (edge != current.edge() && checkIfDirectionValid(current.edge(), current.vertex(), edge)) {
-                directions.add(new Direction(edge, edge.getNext(current.vertex())));
+        for (var rail : current.point().getConnections()) {
+            if (rail != current.rail() && checkIfDirectionValid(current.rail(), current.point(), rail)) {
+                directions.add(new Direction(rail, graph.getVertexValue(rail.getNext(current.point()))));
             }
         }
         return directions;
     }
 
-    private boolean checkIfDirectionValid(Edge<String, Switch, Rail> last, Vertex<String, Switch, Rail> current, Edge<String, Switch, Rail> next) {
-        for (IllegalTransition transition : current.getValue().getIllegalTransitions()) {
-            if ((transition.getLeft() == last && transition.getRight() == next) ||
-                    (transition.getRight() == last && transition.getLeft() == next)) {
+    private boolean checkIfDirectionValid(Rail last, Switch current, Rail next) {
+        for (IllegalTransition transition : current.getIllegalTransitions()) {
+            if ((transition.left() == last && transition.right() == next) ||
+                    (transition.right() == last && transition.left() == next)) {
                 return false;
             }
         }

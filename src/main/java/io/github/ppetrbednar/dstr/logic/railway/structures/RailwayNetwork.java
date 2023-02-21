@@ -4,7 +4,6 @@ import com.github.cliftonlabs.json_simple.JsonException;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
 import io.github.ppetrbednar.dstr.logic.graph.Graph;
-import io.github.ppetrbednar.dstr.logic.graph.Vertex;
 import io.github.ppetrbednar.dstr.logic.railway.PathFinder;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.NoPathFoundException;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.RailwayNetworkLoadException;
@@ -17,9 +16,9 @@ import java.nio.charset.StandardCharsets;
 
 public class RailwayNetwork {
     private String uid;
-    private Graph<String, Switch, Rail> network;
+    private Graph<String, Switch, String, Rail> network;
 
-    public RailwayNetwork(String uid, Graph<String, Switch, Rail> network) {
+    public RailwayNetwork(String uid, Graph<String, Switch, String, Rail> network) {
         this.uid = uid;
         this.network = network;
     }
@@ -32,7 +31,7 @@ public class RailwayNetwork {
         RailwayPath path = null;
         try {
             path = PathFinder.getShortestValidPath(network, source, target, length);
-            path.print(network.getVertex(source), network.getVertex(target));
+            path.print(network.getVertexValue(source), network.getVertexValue(target));
         } catch (NoPathFoundException e) {
             System.out.println("No path found");
         }
@@ -43,15 +42,22 @@ public class RailwayNetwork {
     }
 
     public void removeRail(String key) {
+        Rail rail = network.getEdgeValue(key);
         network.removeEdge(key);
+
+        network.getVertexValue(rail.left()).getConnections().remove(rail);
+        network.getVertexValue(rail.right()).getConnections().remove(rail);
     }
 
     public void addSwitch(String key) {
-        network.addVertex(new Vertex<>(key, new Switch()));
+        network.addVertex(key, new Switch(key));
     }
 
-    public void addRail(String key, String leftSwitchKey, String rightSwitchKey, int length) {
-        network.addEdge(key, leftSwitchKey, rightSwitchKey, new Rail(length));
+    public void addRail(String key, String left, String right, int length) {
+        Rail rail = new Rail(key, left, right, length);
+        network.addEdge(key, left, right, rail);
+        network.getVertexValue(left).getConnections().add(rail);
+        network.getVertexValue(right).getConnections().add(rail);
     }
 
     public static RailwayNetwork loadRailwayNetwork(File file) throws RailwayNetworkLoadException {
@@ -79,7 +85,7 @@ public class RailwayNetwork {
         return uid;
     }
 
-    public Graph<String, Switch, Rail> getNetwork() {
+    public Graph<String, Switch, String, Rail> getNetwork() {
         return network;
     }
 }

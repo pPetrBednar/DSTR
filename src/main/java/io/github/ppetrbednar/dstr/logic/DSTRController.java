@@ -15,7 +15,7 @@ public class DSTRController {
         RailwayNetwork railway = new RailwayNetwork("Example railway", network);
         RailwayNetwork.saveRailwayNetwork(railway, file);
 */
-        example1();
+        example2();
     }
 
     private static void example1() {

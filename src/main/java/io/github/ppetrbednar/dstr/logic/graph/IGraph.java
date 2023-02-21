@@ -2,29 +2,27 @@ package io.github.ppetrbednar.dstr.logic.graph;
 
 import java.util.*;
 
-public interface IGraph<K, V extends Comparable<V>, E extends Comparable<E>> {
+public interface IGraph<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>> {
     void clear();
 
     boolean isEmpty();
 
     int size();
 
-    void addVertex(Vertex<K, V, E> vertex);
+    void addVertex(VK key, VV value);
 
-    void addEdge(Edge<K, V, E> edge);
+    void addEdge(EK key, VK left, VK right, EV value);
 
-    void addEdge(K edgeKey, K leftVertexKey, K rightVertexKey, E value);
+    void removeVertex(VK key);
 
-    Vertex<K, V, E> removeVertex(K key);
+    void removeEdge(EK key);
 
-    Edge<K, V, E> removeEdge(K key);
+    VV getVertexValue(VK key);
 
-    Vertex<K, V, E> getVertex(K key);
+    EV getEdgeValue(EK key);
 
-    Edge<K, V, E> getEdge(K key);
+    Map<VK, VV> getVertexValues();
 
-    Map<K, Vertex<K, V, E>> getVertices();
-
-    Map<K, Edge<K, V, E>> getEdges();
+    Map<EK, EV> getEdgeValues();
 }
 

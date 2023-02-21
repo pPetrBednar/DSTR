@@ -1,7 +1,6 @@
 package io.github.ppetrbednar.dstr.logic.railway.testing;
 
 import io.github.ppetrbednar.dstr.logic.graph.Graph;
-import io.github.ppetrbednar.dstr.logic.graph.Vertex;
 import io.github.ppetrbednar.dstr.logic.railway.structures.IllegalTransition;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Rail;
 import io.github.ppetrbednar.dstr.logic.railway.structures.RailwayNetwork;
@@ -9,7 +8,7 @@ import io.github.ppetrbednar.dstr.logic.railway.structures.Switch;
 
 public class RailwayExampleObject {
     public static void test() {
-        Graph<String, Switch, Rail> network = new Graph<>();
+      /*  Graph<String, Switch, Rail> network = new Graph<>();
 
         Vertex<String, Switch, Rail> v01 = new Vertex<>("V01", new Switch());
         Vertex<String, Switch, Rail> v02 = new Vertex<>("V02", new Switch());
@@ -113,6 +112,6 @@ public class RailwayExampleObject {
         railwayNetwork.removeRail("E05");
         railwayNetwork.removeRail("E18");
 
-        railwayNetwork.printShortestValidPath(source, target, length);
+        railwayNetwork.printShortestValidPath(source, target, length);*/
     }
 }
