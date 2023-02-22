@@ -1,11 +1,5 @@
 package io.github.ppetrbednar.dstr.logic.railway.testing;
 
-import io.github.ppetrbednar.dstr.logic.graph.Graph;
-import io.github.ppetrbednar.dstr.logic.railway.structures.IllegalTransition;
-import io.github.ppetrbednar.dstr.logic.railway.structures.Rail;
-import io.github.ppetrbednar.dstr.logic.railway.structures.RailwayNetwork;
-import io.github.ppetrbednar.dstr.logic.railway.structures.Switch;
-
 public class RailwayExampleObject {
     public static void test() {
       /*  Graph<String, Switch, Rail> network = new Graph<>();

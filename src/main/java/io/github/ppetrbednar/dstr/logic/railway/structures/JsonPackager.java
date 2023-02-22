@@ -33,28 +33,24 @@ public class JsonPackager {
         String left = (String) json.get("left");
         String right = (String) json.get("right");
         int length = ((BigDecimal) json.get("length")).intValue();
-        Rail rail = new Rail(key, left, right, length);
-
-        network.getVertexValue(left).getConnections().add(rail);
-        network.getVertexValue(right).getConnections().add(rail);
 
         network.addEdge(
                 key,
                 left,
                 right,
-                rail
+                new Rail(key, left, right, length)
         );
     }
 
-    private static JsonObject illegalTransitionToJsonObject(IllegalTransition transition) {
+    private static JsonObject illegalTransitionToJsonObject(Transition transition) {
         JsonObject obj = new JsonObject();
         obj.put("left", transition.left().key());
         obj.put("right", transition.right().key());
         return obj;
     }
 
-    private static IllegalTransition jsonObjectToIllegalTransition(Graph<String, Switch, String, Rail> network, JsonObject json) {
-        return new IllegalTransition(network.getEdgeValue((String) json.get("left")), network.getEdgeValue((String) json.get("right")));
+    private static Transition jsonObjectToIllegalTransition(Graph<String, Switch, String, Rail> network, Switch vertex, JsonObject json) {
+        return new Transition(network.getEdgeValue((String) json.get("left")), vertex, network.getEdgeValue((String) json.get("right")));
     }
 
     private static JsonArray verticiesToJsonArray(LinkedList<Switch> vertices) {
@@ -96,7 +92,7 @@ public class JsonPackager {
 
     private static void jsonArrayOfIllegalTransitionsToNetwork(Graph<String, Switch, String, Rail> network, Switch vertex, JsonArray array) {
         array.forEach(jsonObject -> {
-            IllegalTransition illegalTransition = jsonObjectToIllegalTransition(network, (JsonObject) jsonObject);
+            Transition illegalTransition = jsonObjectToIllegalTransition(network, vertex, (JsonObject) jsonObject);
             vertex.getIllegalTransitions().add(illegalTransition);
         });
     }

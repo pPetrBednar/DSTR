@@ -159,4 +159,13 @@ public class Graph<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>>
         });
         return output;
     }
+
+    @Override
+    public PriorityQueue<EV> getEdgeValuesOfVertex(VK key) {
+        PriorityQueue<EV> output = new PriorityQueue<>();
+        vertices.get(key).connections.forEach(edge -> {
+            output.add(edge.value);
+        });
+        return output;
+    }
 }

@@ -4,20 +4,21 @@ import java.util.*;
 
 public class Switch implements Comparable<Switch> {
     private final String key;
-    private final PriorityQueue<Rail> connections;
     private final LinkedList<Direction> shortestPath;
-    private final List<IllegalTransition> illegalPath;
+    private final LinkedList<Transition> illegalTransitions;
+    private final HashMap<Transition, LinkedList<Direction>> reversalPaths;
     private Integer distance = Integer.MAX_VALUE;
 
     public Switch(String key) {
         this.key = key;
-        connections = new PriorityQueue<>();
         shortestPath = new LinkedList<>();
-        illegalPath = new LinkedList<>();
+        illegalTransitions = new LinkedList<>();
+        reversalPaths = new HashMap<>();
     }
 
     public void clear() {
         shortestPath.clear();
+        reversalPaths.clear();
         distance = Integer.MAX_VALUE;
     }
 
@@ -25,16 +26,16 @@ public class Switch implements Comparable<Switch> {
         return key;
     }
 
-    public PriorityQueue<Rail> getConnections() {
-        return connections;
-    }
-
     public LinkedList<Direction> getShortestPath() {
         return shortestPath;
     }
 
-    public List<IllegalTransition> getIllegalTransitions() {
-        return illegalPath;
+    public LinkedList<Transition> getIllegalTransitions() {
+        return illegalTransitions;
+    }
+
+    public HashMap<Transition, LinkedList<Direction>> getReversalPaths() {
+        return reversalPaths;
     }
 
     public int getDistance() {

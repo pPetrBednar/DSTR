@@ -1,8 +1,5 @@
 package io.github.ppetrbednar.dstr.logic;
 
-import io.github.ppetrbednar.dstr.logic.railway.*;
-import io.github.ppetrbednar.dstr.logic.graph.*;
-import io.github.ppetrbednar.dstr.logic.railway.exceptions.NoPathFoundException;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.RailwayNetworkLoadException;
 import io.github.ppetrbednar.dstr.logic.railway.structures.*;
 

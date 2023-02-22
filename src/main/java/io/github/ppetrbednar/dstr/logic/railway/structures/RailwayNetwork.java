@@ -4,14 +4,13 @@ import com.github.cliftonlabs.json_simple.JsonException;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import com.github.cliftonlabs.json_simple.Jsoner;
 import io.github.ppetrbednar.dstr.logic.graph.Graph;
-import io.github.ppetrbednar.dstr.logic.railway.PathFinder;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.NoPathFoundException;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.RailwayNetworkLoadException;
+import io.github.ppetrbednar.dstr.logic.railway.pathfinding.EnhancedDijkstraAlgorithm;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class RailwayNetwork {
@@ -28,9 +27,9 @@ public class RailwayNetwork {
         System.out.println("Target: " + target);
         System.out.println("L = " + length);
 
-        RailwayPath path = null;
+        EnhancedDijkstraAlgorithm.calculateShortestPathFromSourceLengthCheck(network, network.getVertexValue(source), length);
         try {
-            path = PathFinder.getShortestValidPath(network, source, target, length);
+            RailwayPath path = new RailwayPath(network, target);
             path.print(network.getVertexValue(source), network.getVertexValue(target));
         } catch (NoPathFoundException e) {
             System.out.println("No path found");
@@ -44,9 +43,6 @@ public class RailwayNetwork {
     public void removeRail(String key) {
         Rail rail = network.getEdgeValue(key);
         network.removeEdge(key);
-
-        network.getVertexValue(rail.left()).getConnections().remove(rail);
-        network.getVertexValue(rail.right()).getConnections().remove(rail);
     }
 
     public void addSwitch(String key) {
@@ -56,8 +52,6 @@ public class RailwayNetwork {
     public void addRail(String key, String left, String right, int length) {
         Rail rail = new Rail(key, left, right, length);
         network.addEdge(key, left, right, rail);
-        network.getVertexValue(left).getConnections().add(rail);
-        network.getVertexValue(right).getConnections().add(rail);
     }
 
     public static RailwayNetwork loadRailwayNetwork(File file) throws RailwayNetworkLoadException {

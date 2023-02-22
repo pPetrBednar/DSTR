@@ -1,9 +1,9 @@
-package io.github.ppetrbednar.dstr.logic.railway;
+package io.github.ppetrbednar.dstr.logic.railway.pathfinding.legacy;
 
 import io.github.ppetrbednar.dstr.logic.graph.Graph;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.NoPossiblePathException;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Direction;
-import io.github.ppetrbednar.dstr.logic.railway.structures.IllegalTransition;
+import io.github.ppetrbednar.dstr.logic.railway.structures.Transition;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Rail;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Switch;
 
@@ -151,7 +151,7 @@ public class Traveller {
     }
 
     private boolean anyValidPathsExceptLast(Rail invalidRail) {
-        for (var rail : position.getConnections()) {
+        for (var rail : graph.getEdgeValuesOfVertex(position.getKey())) {
             if (rail == invalidRail || rail == getLastCrossedEdgeOrNull()) {
                 continue;
             }
@@ -183,7 +183,7 @@ public class Traveller {
     }
 
     private Direction findShortestValidDirection() {
-        var connections = position.getConnections();
+        var connections = graph.getEdgeValuesOfVertex(position.getKey());
 
         for (Rail rail : connections) {
             if (rail == getLastCrossedEdgeOrNull()) {
@@ -206,7 +206,7 @@ public class Traveller {
 
     private LinkedList<Direction> findShortestValidDirectionsWithoutPlannedDirection() {
         LinkedList<Direction> directions = new LinkedList<>();
-        var connections = position.getConnections();
+        var connections = graph.getEdgeValuesOfVertex(position.getKey());
 
         for (var rail : connections) {
             if (rail != getLastCrossedEdgeOrNull() && rail != planned.rail()) {
@@ -223,7 +223,7 @@ public class Traveller {
     private LinkedList<Direction> findShortestValidDirections(Direction current) {
         LinkedList<Direction> directions = new LinkedList<>();
 
-        for (var rail : current.point().getConnections()) {
+        for (var rail : graph.getEdgeValuesOfVertex(current.point().getKey())) {
             if (rail != current.rail() && checkIfDirectionValid(current.rail(), current.point(), rail)) {
                 directions.add(new Direction(rail, graph.getVertexValue(rail.getNext(current.point()))));
             }
@@ -232,7 +232,7 @@ public class Traveller {
     }
 
     private boolean checkIfDirectionValid(Rail last, Switch current, Rail next) {
-        for (IllegalTransition transition : current.getIllegalTransitions()) {
+        for (Transition transition : current.getIllegalTransitions()) {
             if ((transition.left() == last && transition.right() == next) ||
                     (transition.right() == last && transition.left() == next)) {
                 return false;

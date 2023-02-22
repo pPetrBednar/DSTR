@@ -1,15 +1,15 @@
-package io.github.ppetrbednar.dstr.logic.railway;
+package io.github.ppetrbednar.dstr.logic.railway.pathfinding.legacy;
 
 import io.github.ppetrbednar.dstr.logic.graph.Graph;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.NoPathFoundException;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Direction;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Rail;
-import io.github.ppetrbednar.dstr.logic.railway.structures.RailwayPath;
+import io.github.ppetrbednar.dstr.logic.railway.structures.legacy.RailwayPathLegacy;
 import io.github.ppetrbednar.dstr.logic.railway.structures.Switch;
 
 import java.util.*;
 
-public class PathFinder {
+public class DijkstraAlgorithmWithTraveller {
 
     public static void calculateShortestPathFromSource(Graph<String, Switch, String, Rail> graph, Switch source) {
         graph.getVertexValues().values().forEach(Switch::clear);
@@ -24,7 +24,7 @@ public class PathFinder {
             var current = unsettledVertices.poll();
             unsettledVertices.remove(current);
 
-            for (Rail rail : current.getConnections()) {
+            for (Rail rail : graph.getEdgeValuesOfVertex(current.getKey())) {
                 var adjacent = graph.getVertexValue(rail.left().equals(current.getKey()) ? rail.right() : rail.left());
                 if (!settledVertices.contains(adjacent)) {
                     calculateMinimumDistance(current, rail, adjacent);
@@ -47,7 +47,7 @@ public class PathFinder {
         }
     }
 
-    private static RailwayPath getShortestValidPath(Graph<String, Switch, String, Rail> graph, Switch source, Switch target, int length) throws NoPathFoundException {
+    private static RailwayPathLegacy getShortestValidPath(Graph<String, Switch, String, Rail> graph, Switch source, Switch target, int length) throws NoPathFoundException {
         calculateShortestPathFromSource(graph, source);
 
         if (target.getShortestPath().isEmpty()) {
@@ -65,10 +65,10 @@ public class PathFinder {
         LinkedList<Direction> path = new LinkedList<>(traversedPath);
         Collections.reverse(path);
 
-        return new RailwayPath(path, traveller.getReversalPaths());
+        return new RailwayPathLegacy(path, traveller.getReversalPaths());
     }
 
-    public static RailwayPath getShortestValidPath(Graph<String, Switch, String, Rail> graph, String sourceKey, String targetKey, int length) throws NoPathFoundException {
+    public static RailwayPathLegacy getShortestValidPath(Graph<String, Switch, String, Rail> graph, String sourceKey, String targetKey, int length) throws NoPathFoundException {
         return getShortestValidPath(graph, graph.getVertexValue(sourceKey), graph.getVertexValue(targetKey), length);
     }
 }

@@ -24,5 +24,7 @@ public interface IGraph<VK, VV extends Comparable<VV>, EK, EV extends Comparable
     Map<VK, VV> getVertexValues();
 
     Map<EK, EV> getEdgeValues();
+
+    PriorityQueue<EV> getEdgeValuesOfVertex(VK key);
 }
 
