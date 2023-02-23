@@ -4,15 +4,18 @@ import io.github.ppetrbednar.dstr.logic.graph.Graph;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.RailwayNetworkLoadException;
 import io.github.ppetrbednar.dstr.logic.railway.structures.*;
 import io.github.ppetrbednar.dstr.logic.railway.ui.ActionType;
+import io.github.ppetrbednar.dstr.ui.module.root.Main;
 import io.github.ppetrbednar.dstr.ui.window.alert.AlertManager;
 import javafx.application.Platform;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 import java.io.File;
@@ -22,6 +25,7 @@ public class RailwayVisualizer {
 
     private final HashMap<String, Node> nodes;
     private final File save = new File("./diagram.json");
+    private final Main window;
     private AnchorPane pane;
     private final int cellCountWidth = 60;
     private final int cellCountHeight = 30;
@@ -34,9 +38,10 @@ public class RailwayVisualizer {
     private String tempValue2;
     private RailwayPath path;
 
-    public RailwayVisualizer() {
+    public RailwayVisualizer(Main main) {
         this.railwayNetwork = new RailwayNetwork("Base", new Graph<>());
         nodes = new HashMap<>();
+        this.window = main;
     }
 
     public void setActionType(ActionType actionType) {
@@ -231,6 +236,10 @@ public class RailwayVisualizer {
         c.setOnMousePressed(mouseEvent -> {
             action(-1, -1, key);
         });
+
+        Tooltip t = new Tooltip("ID: " + key);
+        t.setShowDelay(new Duration(0));
+        Tooltip.install(c, t);
         pane.getChildren().add(c);
         nodes.put(key, c);
     }
@@ -254,8 +263,17 @@ public class RailwayVisualizer {
         line.setOnMousePressed(mouseEvent -> {
             action(-1, -1, rail.key());
         });
+
+
+        Tooltip t = new Tooltip("ID: " + rail.key() + "\nLength: " + rail.length());
+        t.setShowDelay(new Duration(0));
+        Tooltip.install(line, t);
         pane.getChildren().add(line);
         nodes.put(rail.key(), line);
+
+        double midPointX = ((left.getPosition().x() + 0.5) * cellSizeWidth + (right.getPosition().x() + 0.5) * cellSizeWidth) / 2;
+        double midPointY = ((left.getPosition().y() + 0.5) * cellSizeHeight + (right.getPosition().y() + 0.5) * cellSizeHeight) / 2;
+        t.show(window.getCallback().getStage(), midPointX, midPointY);
     }
 
     private void printIllegalTransition(Transition transition) {

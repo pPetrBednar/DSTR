@@ -33,7 +33,7 @@ public class Main extends Module<Main, Root> {
     private final Compositor compositor = new Compositor();
     @FXML
     private AnchorPane container;
-    private final RailwayVisualizer visualizer = new RailwayVisualizer();
+    private final RailwayVisualizer visualizer = new RailwayVisualizer(this);
 
     @Override
     @SuppressWarnings("unchecked")
