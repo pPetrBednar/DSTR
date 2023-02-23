@@ -7,6 +7,7 @@ import io.github.ppetrbednar.dstr.logic.graph.Graph;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.NoPathFoundException;
 import io.github.ppetrbednar.dstr.logic.railway.exceptions.RailwayNetworkLoadException;
 import io.github.ppetrbednar.dstr.logic.railway.pathfinding.EnhancedDijkstraAlgorithm;
+import io.github.ppetrbednar.dstr.logic.railway.pathfinding.DijkstraAlgorithmWithTraveller;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -22,14 +23,36 @@ public class RailwayNetwork {
         this.network = network;
     }
 
+    public RailwayPath getShortestValidPath(String source, String target, int length) {
+        try {
+            return EnhancedDijkstraAlgorithm.getShortestValidPath(network, source, target, length);
+        } catch (NoPathFoundException e) {
+            System.out.println("No path found");
+        }
+        return null;
+    }
+
     public void printShortestValidPath(String source, String target, int length) {
         System.out.println("Source: " + source);
         System.out.println("Target: " + target);
         System.out.println("L = " + length);
 
-        EnhancedDijkstraAlgorithm.calculateShortestPathFromSourceLengthCheck(network, network.getVertexValue(source), length);
         try {
-            RailwayPath path = new RailwayPath(network, target);
+            RailwayPath path = EnhancedDijkstraAlgorithm.getShortestValidPath(network, source, target, length);
+            path.print(network.getVertexValue(source), network.getVertexValue(target));
+        } catch (NoPathFoundException e) {
+            System.out.println("No path found");
+        }
+    }
+
+    public void printShortestValidPathLegacy(String source, String target, int length) {
+        System.out.println("Source: " + source);
+        System.out.println("Target: " + target);
+        System.out.println("L = " + length);
+
+
+        try {
+            RailwayPath path = DijkstraAlgorithmWithTraveller.getShortestValidPath(network, source, target, length);
             path.print(network.getVertexValue(source), network.getVertexValue(target));
         } catch (NoPathFoundException e) {
             System.out.println("No path found");
@@ -45,8 +68,8 @@ public class RailwayNetwork {
         network.removeEdge(key);
     }
 
-    public void addSwitch(String key) {
-        network.addVertex(key, new Switch(key));
+    public void addSwitch(String key, Position position) {
+        network.addVertex(key, new Switch(key, position));
     }
 
     public void addRail(String key, String left, String right, int length) {

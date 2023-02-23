@@ -12,11 +12,16 @@ public class JsonPackager {
         JsonObject obj = new JsonObject();
         obj.put("key", vertex.getKey());
         obj.put("illegalTransitions", illegalTransitionsToJsonArray(vertex));
+        obj.put("x", vertex.getPosition().x());
+        obj.put("y", vertex.getPosition().y());
         return obj;
     }
 
     private static void jsonObjectOfVertexToNetwork(Graph<String, Switch, String, Rail> network, JsonObject json) {
-        network.addVertex((String) json.get("key"), new Switch((String) json.get("key")));
+        String key = (String) json.get("key");
+        int x = ((BigDecimal) json.get("x")).intValue();
+        int y = ((BigDecimal) json.get("y")).intValue();
+        network.addVertex((String) json.get("key"), new Switch(key, new Position(x, y)));
     }
 
     private static JsonObject edgeToJsonObject(Rail edge) {

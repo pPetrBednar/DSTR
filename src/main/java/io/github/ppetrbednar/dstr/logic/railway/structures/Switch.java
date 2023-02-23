@@ -8,12 +8,14 @@ public class Switch implements Comparable<Switch> {
     private final LinkedList<Transition> illegalTransitions;
     private final HashMap<Transition, LinkedList<Direction>> reversalPaths;
     private Integer distance = Integer.MAX_VALUE;
+    private Position position;
 
-    public Switch(String key) {
+    public Switch(String key, Position position) {
         this.key = key;
         shortestPath = new LinkedList<>();
         illegalTransitions = new LinkedList<>();
         reversalPaths = new HashMap<>();
+        this.position = position;
     }
 
     public void clear() {
@@ -44,6 +46,10 @@ public class Switch implements Comparable<Switch> {
 
     public void setDistance(Integer distance) {
         this.distance = distance;
+    }
+
+    public Position getPosition() {
+        return position;
     }
 
     @Override

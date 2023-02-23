@@ -1,16 +1,50 @@
 package io.github.ppetrbednar.dstr.logic;
 
+import io.github.ppetrbednar.dstr.logic.graph.Graph;
+import io.github.ppetrbednar.dstr.logic.railway.exceptions.RailwayNetworkLoadException;
+import io.github.ppetrbednar.dstr.logic.railway.structures.*;
+import io.github.ppetrbednar.dstr.logic.railway.ui.ActionType;
+import io.github.ppetrbednar.dstr.ui.window.alert.AlertManager;
+import javafx.application.Platform;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
+import javafx.util.Pair;
+
+import java.io.File;
+import java.util.HashMap;
 
 public class RailwayVisualizer {
+
+    private final HashMap<String, Node> nodes;
+    private final File save = new File("./diagram.json");
     private AnchorPane pane;
     private final int cellCountWidth = 60;
     private final int cellCountHeight = 30;
     private double cellSizeWidth;
     private double cellSizeHeight;
+    private RailwayNetwork railwayNetwork;
+    private ActionType actionType = ActionType.NONE;
+    private int actionCounter;
+    private String tempValue1;
+    private String tempValue2;
+    private RailwayPath path;
+
+    public RailwayVisualizer() {
+        this.railwayNetwork = new RailwayNetwork("Base", new Graph<>());
+        nodes = new HashMap<>();
+    }
+
+    public void setActionType(ActionType actionType) {
+        this.actionType = actionType;
+        actionCounter = 0;
+        tempValue1 = null;
+        tempValue2 = null;
+    }
 
     public void setPane(AnchorPane pane) {
         this.pane = pane;
@@ -22,23 +56,335 @@ public class RailwayVisualizer {
     }
 
     public void printGrid() {
-        for (int i = 0; i < cellCountHeight; i++) {
-            for (int j = 0; j < cellCountWidth; j++) {
+        for (int y = 0; y < cellCountHeight; y++) {
+            for (int x = 0; x < cellCountWidth; x++) {
                 Circle c = new Circle();
-                c.setFill(Color.BLACK);
-                c.setRadius(2);
-                c.setLayoutX((j + 0.5) * cellSizeWidth);
-                c.setLayoutY((i + 0.5) * cellSizeHeight);
+                c.setViewOrder(100);
+                c.setFill(Color.rgb(0, 0, 0, 0.2));
+                c.setRadius(3);
+                c.setLayoutX((x + 0.5) * cellSizeWidth);
+                c.setLayoutY((y + 0.5) * cellSizeHeight);
 
-                int finalI = i;
-                int finalJ = j;
+                int finalY = y;
+                int finalX = x;
                 c.setOnMousePressed(mouseEvent -> {
-                    System.out.println(finalI + " - " + finalJ);
+                    action(finalX, finalY, null);
                 });
                 c.setCursor(Cursor.HAND);
-
                 pane.getChildren().add(c);
             }
         }
+    }
+
+    private void action(int x, int y, String key) {
+        switch (actionType) {
+            case NONE -> System.out.println(x + " - " + y);
+            case ADD_SWITCH -> addSwitch(x, y, key);
+            case ADD_RAIL -> addRail(x, y, key);
+            case ADD_ILLEGAL_TRANSITION -> addIllegalTransition(x, y, key);
+            case REMOVE_SWITCH -> removeSwitch(key);
+            case REMOVE_RAIL -> removeRail(key);
+            case SIMULATE -> simulate(key);
+        }
+    }
+
+    private void removeRail(String key) {
+        if (key == null || railwayNetwork.getNetwork().getEdgeValue(key) == null) {
+            AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Select rail to remove.", false);
+            am.show();
+            return;
+        }
+
+        railwayNetwork.removeRail(key);
+        pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals(key));
+        nodes.remove(key);
+    }
+
+    private void removeSwitch(String key) {
+        if (key == null || railwayNetwork.getNetwork().getVertexValue(key) == null) {
+            AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Select switch to remove.", false);
+            am.show();
+            return;
+        }
+        Switch sw = railwayNetwork.getNetwork().getVertexValue(key);
+        var rails = railwayNetwork.getNetwork().getEdgeValuesOfVertex(key);
+        var illegalTransitions = sw.getIllegalTransitions();
+
+        rails.forEach(rail -> {
+            pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals(rail.key()));
+            nodes.remove(rail.key());
+        });
+        illegalTransitions.forEach(transition -> pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals(transition.left().key() + transition.point().getKey() + transition.right().key())));
+
+        railwayNetwork.removeSwitch(key);
+        pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals(key));
+        nodes.remove(sw.getKey());
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addSwitch(int x, int y, String key) {
+
+        if (key != null) {
+            return;
+        }
+
+        AlertManager am = new AlertManager(AlertManager.AlertType.SINGLE_INPUT, "Enter switch id.", true);
+        am.clear();
+        am.showAndWait(() -> {
+            String k = (String) am.getResult();
+            if (k != null && !k.isEmpty()) {
+                railwayNetwork.addSwitch(k, new Position(x, y));
+                printSwitch(x, y, k);
+            }
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addRail(int x, int y, String key) {
+
+        switch (actionCounter) {
+            case 0 -> {
+                if (key == null || railwayNetwork.getNetwork().getVertexValue(key) == null) {
+                    AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Select first switch to connect rail.", false);
+                    am.show();
+                    return;
+                }
+                tempValue1 = key;
+                actionCounter++;
+            }
+            case 1 -> {
+                if (key == null || railwayNetwork.getNetwork().getVertexValue(key) == null) {
+                    AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Select second switch to connect rail.", false);
+                    am.show();
+                    return;
+                }
+                AlertManager am = new AlertManager(AlertManager.AlertType.DOUBLE_INPUT, "Enter rail id and rail length.", true);
+                am.clear();
+                am.showAndWait(() -> {
+                    Pair<String, String> keyPair = (Pair<String, String>) am.getResult();
+                    if (keyPair != null && !keyPair.getKey().isEmpty() && !keyPair.getValue().isEmpty()) {
+                        railwayNetwork.addRail(keyPair.getKey(), tempValue1, key, Integer.parseInt(keyPair.getValue()));
+                        printRail(railwayNetwork.getNetwork().getEdgeValue(keyPair.getKey()));
+
+                        actionCounter = 0;
+                        tempValue1 = null;
+                    }
+                });
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addIllegalTransition(int x, int y, String key) {
+
+        switch (actionCounter) {
+            case 0 -> {
+                if (key == null || railwayNetwork.getNetwork().getEdgeValue(key) == null) {
+                    AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Select first rail of transition.", false);
+                    am.show();
+                    return;
+                }
+                tempValue1 = key;
+                actionCounter++;
+            }
+            case 1 -> {
+                if (key == null || railwayNetwork.getNetwork().getVertexValue(key) == null) {
+                    AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Select switch of transition.", false);
+                    am.show();
+                    return;
+                }
+
+                tempValue2 = key;
+                actionCounter++;
+            }
+            case 2 -> {
+                if (key == null || railwayNetwork.getNetwork().getEdgeValue(key) == null) {
+                    AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Select second rail of transition.", false);
+                    am.show();
+                    return;
+                }
+
+                Rail left = railwayNetwork.getNetwork().getEdgeValue(tempValue1);
+                Switch sw = railwayNetwork.getNetwork().getVertexValue(tempValue2);
+                Rail right = railwayNetwork.getNetwork().getEdgeValue(key);
+                Transition transition = new Transition(left, sw, right);
+                sw.getIllegalTransitions().add(transition);
+
+                printIllegalTransition(transition);
+
+                actionCounter = 0;
+                tempValue1 = null;
+                tempValue2 = null;
+            }
+        }
+    }
+
+    private void printSwitch(int x, int y, String key) {
+        Circle c = new Circle();
+        c.getStyleClass().add("hover-effect-fill");
+        c.setId(key);
+        c.setViewOrder(30);
+        c.setFill(Color.rgb(0, 0, 0, 1));
+        c.setRadius(8);
+        c.setLayoutX((x + 0.5) * cellSizeWidth);
+        c.setLayoutY((y + 0.5) * cellSizeHeight);
+        c.setOnMousePressed(mouseEvent -> {
+            action(-1, -1, key);
+        });
+        pane.getChildren().add(c);
+        nodes.put(key, c);
+    }
+
+    private void printRail(Rail rail) {
+        Line line = new Line();
+        line.getStyleClass().add("hover-effect-stroke");
+        line.setId(rail.key());
+        line.setStroke(Color.rgb(0, 0, 0, 1));
+        line.setStrokeWidth(4);
+        line.setViewOrder(50);
+
+        Switch left = railwayNetwork.getNetwork().getVertexValue(rail.left());
+        Switch right = railwayNetwork.getNetwork().getVertexValue(rail.right());
+
+        line.setStartX((left.getPosition().x() + 0.5) * cellSizeWidth);
+        line.setStartY((left.getPosition().y() + 0.5) * cellSizeHeight);
+        line.setEndX((right.getPosition().x() + 0.5) * cellSizeWidth);
+        line.setEndY((right.getPosition().y() + 0.5) * cellSizeHeight);
+
+        line.setOnMousePressed(mouseEvent -> {
+            action(-1, -1, rail.key());
+        });
+        pane.getChildren().add(line);
+        nodes.put(rail.key(), line);
+    }
+
+    private void printIllegalTransition(Transition transition) {
+        Switch sw = transition.point();
+        Switch left = railwayNetwork.getNetwork().getVertexValue(transition.left().getNext(sw));
+        Switch right = railwayNetwork.getNetwork().getVertexValue(transition.right().getNext(sw));
+
+        double distanceLeft = Math.sqrt(Math.pow(left.getPosition().x() - sw.getPosition().x(), 2) + Math.pow(left.getPosition().y() - sw.getPosition().y(), 2));
+        double distanceRight = Math.sqrt(Math.pow(right.getPosition().x() - sw.getPosition().x(), 2) + Math.pow(right.getPosition().y() - sw.getPosition().y(), 2));
+
+        double distance = 1;
+        double pointLeftX = sw.getPosition().x() + (distance * (left.getPosition().x() - sw.getPosition().x()) / distanceLeft);
+        double pointLeftY = sw.getPosition().y() + (distance * (left.getPosition().y() - sw.getPosition().y()) / distanceLeft);
+
+        double pointRightX = sw.getPosition().x() + (distance * (right.getPosition().x() - sw.getPosition().x()) / distanceRight);
+        double pointRightY = sw.getPosition().y() + (distance * (right.getPosition().y() - sw.getPosition().y()) / distanceRight);
+
+        Polygon polygon = new Polygon();
+        polygon.getStyleClass().add("hover-effect-fill");
+        polygon.setId(transition.left().key() + transition.point().getKey() + transition.right().key());
+        polygon.setViewOrder(200);
+        polygon.getPoints().addAll(
+                (sw.getPosition().x() + 0.5) * cellSizeWidth,
+                (sw.getPosition().y() + 0.5) * cellSizeHeight,
+                (pointLeftX + 0.5) * cellSizeWidth,
+                (pointLeftY + 0.5) * cellSizeHeight,
+                (pointRightX + 0.5) * cellSizeWidth,
+                (pointRightY + 0.5) * cellSizeHeight
+        );
+        polygon.setFill(Color.rgb(192, 192, 192));
+        polygon.setOnMousePressed(mouseEvent -> {
+            if (actionType == ActionType.REMOVE_ILLEGAL_TRANSITION) {
+                Switch swi = railwayNetwork.getNetwork().getVertexValue(transition.point().getKey());
+                swi.getIllegalTransitions().remove(transition);
+                pane.getChildren().remove(polygon);
+            }
+        });
+
+        pane.getChildren().add(polygon);
+    }
+
+    public void load() {
+        try {
+            railwayNetwork = RailwayNetwork.loadRailwayNetwork(save);
+            pane.getChildren().clear();
+            printGrid();
+            printRailwayNetwork();
+        } catch (RailwayNetworkLoadException e) {
+            System.out.println("Not loaded");
+        }
+    }
+
+    private void printRailwayNetwork() {
+        railwayNetwork.getNetwork().getVertexValues().forEach((s, sw) -> {
+            printSwitch(sw.getPosition().x(), sw.getPosition().y(), sw.getKey());
+            sw.getIllegalTransitions().forEach(this::printIllegalTransition);
+        });
+        railwayNetwork.getNetwork().getEdgeValues().forEach((s, rail) -> {
+            printRail(rail);
+        });
+    }
+
+    public void save() {
+        RailwayNetwork.saveRailwayNetwork(railwayNetwork, save);
+    }
+
+    public void simulate(String key) {
+        switch (actionCounter) {
+            case 0 -> {
+                if (key == null || railwayNetwork.getNetwork().getVertexValue(key) == null) {
+                    AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Select source switch.", false);
+                    am.show();
+                    return;
+                }
+                tempValue1 = key;
+                actionCounter++;
+            }
+            case 1 -> {
+                if (key == null || railwayNetwork.getNetwork().getVertexValue(key) == null) {
+                    AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Select target switch.", false);
+                    am.show();
+                    return;
+                }
+
+                AlertManager am = new AlertManager(AlertManager.AlertType.SINGLE_INPUT, "Select railway set length.", true);
+                am.clear();
+                am.showAndWait(() -> {
+                    Integer length = Integer.parseInt((String) am.getResult());
+                    simulate(tempValue1, key, length);
+
+                    actionCounter = 0;
+                    tempValue1 = null;
+                });
+
+            }
+        }
+    }
+
+    private void simulate(String source, String target, Integer length) {
+        Platform.runLater(() -> {
+            path = railwayNetwork.getShortestValidPath(source, target, length);
+            path.getPath().forEach(direction -> {
+                Line line = (Line) nodes.get(direction.rail().key());
+                line.setStroke(Color.web("#ff0000"));
+            });
+            path.getReversalPaths().forEach((transition, directions) -> {
+                directions.forEach(direction -> {
+                    Line line = (Line) nodes.get(direction.rail().key());
+                    line.setStroke(Color.web("#00ff00"));
+                });
+            });
+        });
+    }
+
+    public void clearSimulation() {
+        Platform.runLater(() -> {
+            if (path != null) {
+                path.getPath().forEach(direction -> {
+                    Line line = (Line) nodes.get(direction.rail().key());
+                    line.setStroke(Color.web("#000000"));
+                });
+                path.getReversalPaths().forEach((transition, directions) -> {
+                    directions.forEach(direction -> {
+                        Line line = (Line) nodes.get(direction.rail().key());
+                        line.setStroke(Color.web("#000000"));
+                    });
+                });
+                path = null;
+            }
+        });
     }
 }

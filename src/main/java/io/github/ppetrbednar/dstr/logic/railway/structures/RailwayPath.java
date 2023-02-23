@@ -11,13 +11,38 @@ public class RailwayPath {
     private final LinkedList<Direction> path;
     private final HashMap<Transition, LinkedList<Direction>> reversalPaths;
 
-    public RailwayPath(Graph<String, Switch, String, Rail> network, String target) throws NoPathFoundException {
-        LinkedList<Direction> dijkstraPath = network.getVertexValue(target).getShortestPath();
+    public LinkedList<Direction> getPath() {
+        return path;
+    }
+
+    public HashMap<Transition, LinkedList<Direction>> getReversalPaths() {
+        return reversalPaths;
+    }
+
+    public RailwayPath(Graph<String, Switch, String, Rail> network, Switch target) throws NoPathFoundException {
+        LinkedList<Direction> dijkstraPath = target.getShortestPath();
         if (dijkstraPath.isEmpty()) {
             throw new NoPathFoundException();
         }
         path = new LinkedList<>(dijkstraPath);
         reversalPaths = new HashMap<>();
+
+        Direction last = null;
+        for (Direction direction : path) {
+            if (last != null) {
+                Transition transition = new Transition(last.rail(), direction.point(), direction.rail());
+                LinkedList<Direction> reversalPath = direction.point().getReversalPaths().get(transition);
+                if (reversalPath != null) {
+                    reversalPaths.put(transition, reversalPath);
+                }
+            }
+            last = direction;
+        }
+    }
+
+    public RailwayPath(LinkedList<Direction> path) {
+        this.path = new LinkedList<>(path);
+        this.reversalPaths = new HashMap<>();
 
         Direction last = null;
         for (Direction direction : path) {

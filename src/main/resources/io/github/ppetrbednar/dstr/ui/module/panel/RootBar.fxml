@@ -9,8 +9,7 @@
 
 <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="600.0" style="-fx-background-color: -fx-primary-color;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.ppetrbednar.dstr.ui.module.panel.RootBar">
    <children>
-      <Pane prefWidth="250.0" style="-fx-background-color: -fx-secondary-color;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <Pane layoutX="10.0" layoutY="10.0" styleClass="secondary-gradient-background-color" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="0.0" />
+      <Pane layoutX="10.0" layoutY="10.0" style="-fx-background-color: -fx-primary-color;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="0.0" />
       <Pane fx:id="moveArea" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="5.0">
          <cursor>
             <Cursor fx:constant="MOVE" />

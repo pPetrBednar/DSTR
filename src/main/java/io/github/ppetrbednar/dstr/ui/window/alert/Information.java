@@ -62,6 +62,11 @@ public class Information extends Screen<Information> implements IAlert {
     }
 
     @Override
+    public void clear() {
+
+    }
+
+    @Override
     public Object getResult() {
         return result;
     }

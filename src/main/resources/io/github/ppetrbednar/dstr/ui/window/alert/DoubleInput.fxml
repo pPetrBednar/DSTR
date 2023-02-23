@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" style="-fx-border-color: #18202c;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.ppetrbednar.dstr.ui.window.alert.SingleInput">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" style="-fx-border-color: #18202c;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="io.github.ppetrbednar.dstr.ui.window.alert.DoubleInput">
    <center>
       <AnchorPane style="-fx-background-color: -fx-secondary-color;" BorderPane.alignment="CENTER">
          <children>
@@ -41,12 +41,17 @@
                   <String fx:value="no-bg-radius" />
                </styleClass>
             </JFXButton>
-            <Label fx:id="text" alignment="CENTER" layoutX="30.0" layoutY="56.0" prefHeight="46.0" prefWidth="438.0" style="-fx-text-fill: -fx-primary-text-color;" text="Data input text" textAlignment="CENTER" textFill="#f3f3f3" wrapText="true" AnchorPane.bottomAnchor="166.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="56.0">
+            <Label fx:id="text" alignment="CENTER" layoutX="30.0" layoutY="27.0" prefHeight="46.0" prefWidth="438.0" style="-fx-text-fill: -fx-primary-text-color;" text="Data input text" textAlignment="CENTER" textFill="#f3f3f3" wrapText="true" AnchorPane.bottomAnchor="193.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="27.0">
                <font>
                   <Font name="Source Sans Pro" size="16.0" />
                </font>
             </Label>
-            <JFXTextField fx:id="input" alignment="CENTER" layoutX="30.0" layoutY="134.0" prefHeight="40.0" prefWidth="424.0" promptText="Switch id" styleClass="text-field-style-1" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0">
+            <JFXTextField fx:id="input1" alignment="CENTER" focusTraversable="false" layoutX="30.0" layoutY="103.0" prefHeight="40.0" prefWidth="424.0" promptText="Rail ID" styleClass="text-field-style-1" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0">
+               <font>
+                  <Font name="Source Sans Pro" size="14.0" />
+               </font>
+            </JFXTextField>
+            <JFXTextField fx:id="input2" alignment="CENTER" focusTraversable="false" layoutX="30.0" layoutY="164.0" prefHeight="40.0" prefWidth="424.0" promptText="Rail length" styleClass="text-field-style-1" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0">
                <font>
                   <Font name="Source Sans Pro" size="14.0" />
                </font>

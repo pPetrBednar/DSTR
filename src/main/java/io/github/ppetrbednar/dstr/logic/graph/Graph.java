@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 public class Graph<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>> implements IGraph<VK, VV, EK, EV> {
-    public class Edge<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>> implements Comparable<Edge<VK, VV, EK, EV>> {
+    private class Edge<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>> implements Comparable<Edge<VK, VV, EK, EV>> {
         private final EK key;
         private final Vertex<VK, VV, EK, EV> left;
         private final Vertex<VK, VV, EK, EV> right;
@@ -51,7 +51,7 @@ public class Graph<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>>
         }
     }
 
-    public class Vertex<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>> implements Comparable<Vertex<VK, VV, EK, EV>> {
+    private class Vertex<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>> implements Comparable<Vertex<VK, VV, EK, EV>> {
         private final VK key;
         private final PriorityQueue<Edge<VK, VV, EK, EV>> connections;
         private final VV value;
@@ -134,11 +134,17 @@ public class Graph<VK, VV extends Comparable<VV>, EK, EV extends Comparable<EV>>
 
     @Override
     public VV getVertexValue(VK key) {
+        if (!vertices.containsKey(key)) {
+            return null;
+        }
         return vertices.get(key).getValue();
     }
 
     @Override
     public EV getEdgeValue(EK key) {
+        if (!edges.containsKey(key)) {
+            return null;
+        }
         return edges.get(key).getValue();
     }
 

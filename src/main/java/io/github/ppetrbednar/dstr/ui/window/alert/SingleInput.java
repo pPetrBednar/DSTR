@@ -65,6 +65,11 @@ public class SingleInput extends Screen<SingleInput> implements IAlert {
     }
 
     @Override
+    public void clear() {
+        input.clear();
+    }
+
+    @Override
     public Object getResult() {
         return result;
     }

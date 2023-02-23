@@ -4,7 +4,7 @@ import io.github.ppetrbednar.dstr.logic.DSTRController;
 
 public class AppLauncher {
     public static void main(String[] args) {
-        //App.main(args);
-        DSTRController.test();
+        App.main(args);
+        //DSTRController.test();
     }
 }

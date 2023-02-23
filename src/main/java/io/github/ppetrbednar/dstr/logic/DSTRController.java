@@ -27,7 +27,10 @@ public class DSTRController {
             railwayNetwork.removeRail("E05");
             railwayNetwork.removeRail("E18");
 
+            System.out.println("Enhanced Dijkstra algorithm");
             railwayNetwork.printShortestValidPath(source, target, length);
+            System.out.println("Dijkstra algorithm with Traveller");
+            railwayNetwork.printShortestValidPathLegacy(source, target, length);
         } catch (RailwayNetworkLoadException e) {
             System.out.println(e.getMessage());
         }
@@ -38,7 +41,7 @@ public class DSTRController {
         try {
             RailwayNetwork railwayNetwork = RailwayNetwork.loadRailwayNetwork(file);
 
-            railwayNetwork.addSwitch("SV101");
+            railwayNetwork.addSwitch("SV101", new Position(0, 0));
             railwayNetwork.addRail("SE101", "V13", "SV101", 200);
 
             String source = "V23";
@@ -48,7 +51,10 @@ public class DSTRController {
             railwayNetwork.removeRail("E05");
             railwayNetwork.removeRail("E18");
 
+            System.out.println("Enhanced Dijkstra algorithm");
             railwayNetwork.printShortestValidPath(source, target, length);
+            System.out.println("Dijkstra algorithm with Traveller");
+            railwayNetwork.printShortestValidPathLegacy(source, target, length);
         } catch (RailwayNetworkLoadException e) {
             System.out.println(e.getMessage());
         }

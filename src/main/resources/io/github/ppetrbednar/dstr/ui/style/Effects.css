@@ -21,6 +21,16 @@
     -fx-cursor: hand;
 }
 
+.hover-effect-stroke:hover {
+    -fx-stroke: rgba(0, 0, 0, 0.60) !important;
+    -fx-cursor: hand;
+}
+
+.hover-effect-fill:hover {
+    -fx-fill: rgba(0, 0, 0, 0.60) !important;
+    -fx-cursor: hand;
+}
+
 .disable-focus:focused {
     -fx-focus-color: transparent !important;
     -jfx-disable-visual-focus: true;

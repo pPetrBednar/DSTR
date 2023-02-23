@@ -10,5 +10,7 @@ public interface IAlert {
 
     public void setText(String text);
 
+    public void clear();
+
     public Object getResult();
 }

@@ -1,17 +1,24 @@
 package io.github.ppetrbednar.dstr.logic.railway.pathfinding;
 
 import io.github.ppetrbednar.dstr.logic.graph.Graph;
-import io.github.ppetrbednar.dstr.logic.railway.structures.Direction;
-import io.github.ppetrbednar.dstr.logic.railway.structures.Rail;
-import io.github.ppetrbednar.dstr.logic.railway.structures.Switch;
-import io.github.ppetrbednar.dstr.logic.railway.structures.Transition;
+import io.github.ppetrbednar.dstr.logic.railway.exceptions.NoPathFoundException;
+import io.github.ppetrbednar.dstr.logic.railway.structures.*;
 
 import java.util.*;
 
 public class EnhancedDijkstraAlgorithm {
 
-    public static void calculateShortestPathFromSourceLengthCheck(Graph<String, Switch, String, Rail> graph, Switch source, int length) {
+    public static RailwayPath getShortestValidPath(Graph<String, Switch, String, Rail> graph, Switch source, Switch target, int length) throws NoPathFoundException {
         graph.getVertexValues().values().forEach(Switch::clear);
+        calculateShortestPathFromSourceLengthCheck(graph, source, length);
+        return new RailwayPath(graph, target);
+    }
+
+    public static RailwayPath getShortestValidPath(Graph<String, Switch, String, Rail> graph, String sourceKey, String targetKey, int length) throws NoPathFoundException {
+        return getShortestValidPath(graph, graph.getVertexValue(sourceKey), graph.getVertexValue(targetKey), length);
+    }
+
+    private static void calculateShortestPathFromSourceLengthCheck(Graph<String, Switch, String, Rail> graph, Switch source, int length) {
         source.setDistance(0);
 
         Set<Switch> settledVertices = new HashSet<>();

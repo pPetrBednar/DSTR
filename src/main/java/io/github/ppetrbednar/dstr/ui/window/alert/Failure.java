@@ -2,8 +2,10 @@ package io.github.ppetrbednar.dstr.ui.window.alert;
 
 import com.jfoenix.controls.JFXButton;
 import io.github.ppetrbednar.dstr.ui.handler.Screen;
+
 import java.net.URL;
 import java.util.ResourceBundle;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -59,6 +61,11 @@ public class Failure extends Screen<Failure> implements IAlert {
     @Override
     public void setText(String text) {
         this.text.setText(text);
+    }
+
+    @Override
+    public void clear() {
+
     }
 
     @Override

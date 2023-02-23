@@ -1,14 +1,15 @@
 package io.github.ppetrbednar.dstr.ui.window.alert;
 
 import io.github.ppetrbednar.dstr.ui.handler.ScreenLoader;
+
 import java.io.IOException;
+
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 /**
- *
  * @author Petr Bednář
  */
 public class AlertManager {
@@ -17,6 +18,7 @@ public class AlertManager {
     private static ScreenLoader<Warning> warning;
     private static ScreenLoader<Failure> failure;
     private static ScreenLoader<SingleInput> singleInput;
+    private static ScreenLoader<DoubleInput> doubleInput;
     private static boolean setup = false;
 
     static {
@@ -25,6 +27,8 @@ public class AlertManager {
             warning = new ScreenLoader<>("window/alert/Warning", Modality.APPLICATION_MODAL);
             failure = new ScreenLoader<>("window/alert/Failure", Modality.APPLICATION_MODAL);
             singleInput = new ScreenLoader<>("window/alert/SingleInput", Modality.APPLICATION_MODAL);
+            doubleInput = new ScreenLoader<>("window/alert/DoubleInput", Modality.APPLICATION_MODAL);
+
         } catch (IOException ex) {
             // Information alerts cannot be loaded
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -38,25 +42,19 @@ public class AlertManager {
         INFORMATION,
         WARNING,
         FAILURE,
-        SINGLE_INPUT;
+        SINGLE_INPUT,
+        DOUBLE_INPUT;
     }
 
     private ScreenLoader<? extends IAlert> loader;
 
     public AlertManager(AlertType type, String text, boolean cancel) {
         switch (type) {
-            case INFORMATION:
-                loader = information;
-                break;
-            case WARNING:
-                loader = warning;
-                break;
-            case FAILURE:
-                loader = failure;
-                break;
-            case SINGLE_INPUT:
-                loader = singleInput;
-                break;
+            case INFORMATION -> loader = information;
+            case WARNING -> loader = warning;
+            case FAILURE -> loader = failure;
+            case SINGLE_INPUT -> loader = singleInput;
+            case DOUBLE_INPUT -> loader = doubleInput;
         }
 
         loader.getController().setText(text);
@@ -79,7 +77,6 @@ public class AlertManager {
                 task.run();
             }
         });
-
     }
 
     public Object getResult() {
@@ -89,6 +86,14 @@ public class AlertManager {
         }
 
         return loader.getController().getResult();
+    }
+
+    public void clear() {
+        if (loader == null) {
+            return;
+        }
+
+        loader.getController().clear();
     }
 
     public static void setupStage(Stage stage) {
@@ -112,6 +117,10 @@ public class AlertManager {
         singleInput.setupStage("", stage);
         singleInput.setupStageTitle("Data input alert");
         singleInput.setTransparent(true);
+
+        doubleInput.setupStage("", stage);
+        doubleInput.setupStageTitle("Data input alert");
+        doubleInput.setTransparent(true);
 
         setup = true;
     }
