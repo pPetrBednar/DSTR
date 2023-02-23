@@ -32,6 +32,15 @@ public class RailwayNetwork {
         return null;
     }
 
+    public RailwayPath getShortestValidPathLegacy(String source, String target, int length) {
+        try {
+            return DijkstraAlgorithmWithTraveller.getShortestValidPath(network, source, target, length);
+        } catch (NoPathFoundException e) {
+            System.out.println("No path found");
+        }
+        return null;
+    }
+
     public void printShortestValidPath(String source, String target, int length) {
         System.out.println("Source: " + source);
         System.out.println("Target: " + target);

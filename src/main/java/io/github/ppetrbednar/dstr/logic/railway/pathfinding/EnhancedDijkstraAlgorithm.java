@@ -113,6 +113,10 @@ public class EnhancedDijkstraAlgorithm {
         Collections.reverse(directions);
 
         for (Direction direction : directions) {
+            if (checkIfDirectionVisited(reversalPath, direction)) {
+                continue;
+            }
+
             if (distance + direction.rail().length() >= length) {
                 reversalPath.add(direction);
                 return reversalPath;
@@ -125,5 +129,14 @@ public class EnhancedDijkstraAlgorithm {
             }
         }
         return null;
+    }
+
+    private static boolean checkIfDirectionVisited(LinkedList<Direction> reversalPath, Direction direction) {
+        for (Direction dir : reversalPath) {
+            if (dir.point().getKey().equals(direction.point().getKey()) || dir.rail().key().equals(direction.rail().key())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

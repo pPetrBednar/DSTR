@@ -10,7 +10,7 @@ rem PROJECT_VERSION: version used in pom.xml, e.g. 1.0-SNAPSHOT
 rem APP_VERSION: the application version, e.g. 1.0.0, shown in "about" dialog
 
 set JAVA_VERSION=19
-set MAIN_JAR=Palladium-%PROJECT_VERSION%.jar
+set MAIN_JAR=DSTR-%PROJECT_VERSION%.jar
 
 rem Set desired installer type: "app-image" "msi" "exe".
 set INSTALLER_TYPE=msi
@@ -33,14 +33,8 @@ xcopy /S /Q target\lib\* target\installer\input\lib\
 echo Copying libraries
 xcopy /S /Q app\lib\* target\installer\input\lib\
 
-echo Copying sql
-xcopy /S /Q app\sql\* target\installer\input\sql\
-
 echo Copying resources
 xcopy /S /Q app\res\* target\installer\input\res\
-
-echo Copying manual
-xcopy /S /Q app\man\* target\installer\input\man\
 
 echo Copying main jar
 copy target\%MAIN_JAR% target\installer\input\lib\
@@ -57,7 +51,7 @@ echo Detecting required modules
   --multi-release %JAVA_VERSION% ^
   --ignore-missing-deps ^
   --class-path "target\installer\input\lib\*" ^
-  --print-module-deps target\classes\io\github\ppetrbednar\palladium\App.class > temp.txt
+  --print-module-deps target\classes\io\github\ppetrbednar\dstr\App.class > temp.txt
 
 set /p detected_modules=<temp.txt
 

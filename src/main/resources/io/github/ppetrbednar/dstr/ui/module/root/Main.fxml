@@ -17,17 +17,17 @@
    <children>
       <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="200.0" spacing="10.0" style="-fx-background-color: -fx-secondary-color;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <JFXButton focusTraversable="false" onAction="#modeAddSwitch" prefWidth="70.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-information" text="Switch">
+            <JFXButton fx:id="addSwitchBtn" focusTraversable="false" onAction="#modeAddSwitch" onMouseEntered="#showSwitchTooltips" onMouseExited="#hideSwitchTooltips" prefWidth="70.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-information" text="Switch">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
             </JFXButton>
-            <JFXButton focusTraversable="false" onAction="#modeAddRail" prefWidth="70.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-information" text="Rail">
+            <JFXButton fx:id="addRailBtn" focusTraversable="false" onAction="#modeAddRail" onMouseEntered="#showRailTooltips" onMouseExited="#hideRailTooltips" prefWidth="70.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-information" text="Rail">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
             </JFXButton>
-            <JFXButton focusTraversable="false" onAction="#modeAddIllegalTransition" prefWidth="130.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-information" text="Illegal Transition">
+            <JFXButton fx:id="addIllegalTransitionBtn" focusTraversable="false" onAction="#modeAddIllegalTransition" prefWidth="130.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-information" text="Illegal Transition">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
@@ -37,17 +37,17 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </Separator>
-            <JFXButton focusTraversable="false" onAction="#modeRemoveSwitch" prefWidth="70.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-danger" text="Switch">
+            <JFXButton fx:id="removeSwitchBtn" focusTraversable="false" onAction="#modeRemoveSwitch" prefWidth="70.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-danger" text="Switch">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
             </JFXButton>
-            <JFXButton focusTraversable="false" onAction="#modeRemoveRail" prefWidth="70.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-danger" text="Rail">
+            <JFXButton fx:id="removeRailBtn" focusTraversable="false" onAction="#modeRemoveRail" prefWidth="70.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-danger" text="Rail">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
             </JFXButton>
-            <JFXButton focusTraversable="false" onAction="#modeRemoveIllegalTransition" prefWidth="130.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-danger" text="Illegal Transition">
+            <JFXButton fx:id="removeIllegalTransition" focusTraversable="false" onAction="#modeRemoveIllegalTransition" prefWidth="130.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-danger" text="Illegal Transition">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
@@ -59,7 +59,7 @@
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="40.0" spacing="10.0" style="-fx-background-color: -fx-secondary-color;" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <JFXButton focusTraversable="false" onAction="#simulate" prefWidth="100.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-information" text="Simulate">
+            <JFXButton fx:id="simulateBtn" focusTraversable="false" onAction="#simulate" prefWidth="100.0" style="-fx-text-fill: -fx-primary-text-color;" styleClass="hover-effect-information" text="Simulate">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>

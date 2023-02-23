@@ -7,14 +7,17 @@ import io.github.ppetrbednar.dstr.logic.railway.ui.ActionType;
 import io.github.ppetrbednar.dstr.ui.module.root.Main;
 import io.github.ppetrbednar.dstr.ui.window.alert.AlertManager;
 import javafx.application.Platform;
+import javafx.geometry.Bounds;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
@@ -29,6 +32,10 @@ public class RailwayVisualizer {
     private AnchorPane pane;
     private final int cellCountWidth = 60;
     private final int cellCountHeight = 30;
+    private final double tooltipRailWidth = 40;
+    private final double tooltipRailHeight = 40;
+    private final double tooltipSwitchWidth = 40;
+    private final double tooltipSwitchHeight = 40;
     private double cellSizeWidth;
     private double cellSizeHeight;
     private RailwayNetwork railwayNetwork;
@@ -37,11 +44,15 @@ public class RailwayVisualizer {
     private String tempValue1;
     private String tempValue2;
     private RailwayPath path;
+    private final HashMap<String, Tooltip> switchTooltips;
+    private final HashMap<String, Tooltip> railTooltips;
 
     public RailwayVisualizer(Main main) {
         this.railwayNetwork = new RailwayNetwork("Base", new Graph<>());
         nodes = new HashMap<>();
         this.window = main;
+        switchTooltips = new HashMap<>();
+        railTooltips = new HashMap<>();
     }
 
     public void setActionType(ActionType actionType) {
@@ -103,6 +114,7 @@ public class RailwayVisualizer {
         railwayNetwork.removeRail(key);
         pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals(key));
         nodes.remove(key);
+        railTooltips.remove(key);
     }
 
     private void removeSwitch(String key) {
@@ -118,12 +130,14 @@ public class RailwayVisualizer {
         rails.forEach(rail -> {
             pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals(rail.key()));
             nodes.remove(rail.key());
+            railTooltips.remove(rail.key());
         });
         illegalTransitions.forEach(transition -> pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals(transition.left().key() + transition.point().getKey() + transition.right().key())));
 
         railwayNetwork.removeSwitch(key);
         pane.getChildren().removeIf(node -> node.getId() != null && node.getId().equals(key));
         nodes.remove(sw.getKey());
+        switchTooltips.remove(key);
     }
 
     @SuppressWarnings("unchecked")
@@ -237,11 +251,15 @@ public class RailwayVisualizer {
             action(-1, -1, key);
         });
 
-        Tooltip t = new Tooltip("ID: " + key);
+        Tooltip t = new Tooltip(key);
+        t.setPrefSize(tooltipSwitchWidth, tooltipSwitchHeight);
+        t.setStyle("-fx-font-size: 9px;");
+        t.setTextAlignment(TextAlignment.CENTER);
         t.setShowDelay(new Duration(0));
         Tooltip.install(c, t);
         pane.getChildren().add(c);
         nodes.put(key, c);
+        switchTooltips.put(key, t);
     }
 
     private void printRail(Rail rail) {
@@ -264,16 +282,51 @@ public class RailwayVisualizer {
             action(-1, -1, rail.key());
         });
 
-
-        Tooltip t = new Tooltip("ID: " + rail.key() + "\nLength: " + rail.length());
+        Tooltip t = new Tooltip(rail.key() + "\n(" + rail.length() + ")");
+        t.setPrefSize(tooltipRailWidth, tooltipRailHeight);
+        t.setStyle("-fx-font-size: 9px;");
+        t.setTextAlignment(TextAlignment.CENTER);
         t.setShowDelay(new Duration(0));
         Tooltip.install(line, t);
         pane.getChildren().add(line);
         nodes.put(rail.key(), line);
+        railTooltips.put(rail.key(), t);
+    }
 
-        double midPointX = ((left.getPosition().x() + 0.5) * cellSizeWidth + (right.getPosition().x() + 0.5) * cellSizeWidth) / 2;
-        double midPointY = ((left.getPosition().y() + 0.5) * cellSizeHeight + (right.getPosition().y() + 0.5) * cellSizeHeight) / 2;
-        t.show(window.getCallback().getStage(), midPointX, midPointY);
+    public void showRailTooltips() {
+        Bounds screenBounds = pane.localToScreen(pane.getBoundsInLocal());
+        int screenBoundsMinX = (int) screenBounds.getMinX();
+        int screenBoundsMinY = (int) screenBounds.getMinY();
+
+        railTooltips.forEach((key, tooltip) -> {
+            Rail rail = railwayNetwork.getNetwork().getEdgeValue(key);
+            Switch left = railwayNetwork.getNetwork().getVertexValue(rail.left());
+            Switch right = railwayNetwork.getNetwork().getVertexValue(rail.right());
+            double midPointX = screenBoundsMinX - (tooltipRailWidth / 2) + ((left.getPosition().x() + 0.5) * cellSizeWidth + (right.getPosition().x() + 0.5) * cellSizeWidth) / 2;
+            double midPointY = screenBoundsMinY - (tooltipRailHeight / 2) + ((left.getPosition().y() + 0.5) * cellSizeHeight + (right.getPosition().y() + 0.5) * cellSizeHeight) / 2;
+            tooltip.show(pane, midPointX, midPointY);
+        });
+    }
+
+    public void hideRailTooltips() {
+        railTooltips.forEach((rail, tooltip) -> tooltip.hide());
+    }
+
+    public void showSwitchTooltips() {
+        Bounds screenBounds = pane.localToScreen(pane.getBoundsInLocal());
+        int screenBoundsMinX = (int) screenBounds.getMinX();
+        int screenBoundsMinY = (int) screenBounds.getMinY();
+
+        switchTooltips.forEach((key, tooltip) -> {
+            Switch sw = railwayNetwork.getNetwork().getVertexValue(key);
+            double pointX = screenBoundsMinX - (tooltipSwitchWidth / 2) + (sw.getPosition().x() + 0.5) * cellSizeWidth;
+            double pointY = screenBoundsMinY - (tooltipSwitchHeight / 2) + (sw.getPosition().y() + 0.5) * cellSizeHeight;
+            tooltip.show(pane, pointX, pointY);
+        });
+    }
+
+    public void hideSwitchTooltips() {
+        switchTooltips.forEach((sw, tooltip) -> tooltip.hide());
     }
 
     private void printIllegalTransition(Transition transition) {
@@ -318,7 +371,7 @@ public class RailwayVisualizer {
     public void load() {
         try {
             railwayNetwork = RailwayNetwork.loadRailwayNetwork(save);
-            pane.getChildren().clear();
+            clear();
             printGrid();
             printRailwayNetwork();
         } catch (RailwayNetworkLoadException e) {
@@ -334,6 +387,16 @@ public class RailwayVisualizer {
         railwayNetwork.getNetwork().getEdgeValues().forEach((s, rail) -> {
             printRail(rail);
         });
+    }
+
+    private void clear() {
+        pane.getChildren().clear();
+        path = null;
+        nodes.clear();
+        railTooltips.clear();
+        switchTooltips.clear();
+        printGrid();
+        printRailwayNetwork();
     }
 
     public void save() {
@@ -375,6 +438,17 @@ public class RailwayVisualizer {
     private void simulate(String source, String target, Integer length) {
         Platform.runLater(() -> {
             path = railwayNetwork.getShortestValidPath(source, target, length);
+
+            if (path == null) {
+                path = railwayNetwork.getShortestValidPathLegacy(source, target, length);
+            }
+
+            if (path == null) {
+                AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "No valid path found.", false);
+                am.show();
+                return;
+            }
+
             path.getPath().forEach(direction -> {
                 Line line = (Line) nodes.get(direction.rail().key());
                 line.setStroke(Color.web("#ff0000"));
@@ -389,20 +463,6 @@ public class RailwayVisualizer {
     }
 
     public void clearSimulation() {
-        Platform.runLater(() -> {
-            if (path != null) {
-                path.getPath().forEach(direction -> {
-                    Line line = (Line) nodes.get(direction.rail().key());
-                    line.setStroke(Color.web("#000000"));
-                });
-                path.getReversalPaths().forEach((transition, directions) -> {
-                    directions.forEach(direction -> {
-                        Line line = (Line) nodes.get(direction.rail().key());
-                        line.setStroke(Color.web("#000000"));
-                    });
-                });
-                path = null;
-            }
-        });
+        Platform.runLater(this::clear);
     }
 }
