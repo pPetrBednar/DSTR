@@ -395,8 +395,6 @@ public class RailwayVisualizer {
         nodes.clear();
         railTooltips.clear();
         switchTooltips.clear();
-        printGrid();
-        printRailwayNetwork();
     }
 
     public void save() {
@@ -463,6 +461,10 @@ public class RailwayVisualizer {
     }
 
     public void clearSimulation() {
-        Platform.runLater(this::clear);
+        Platform.runLater(() -> {
+            clear();
+            printGrid();
+            printRailwayNetwork();
+        });
     }
 }

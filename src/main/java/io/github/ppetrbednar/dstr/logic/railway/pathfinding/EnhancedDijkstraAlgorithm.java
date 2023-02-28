@@ -87,6 +87,10 @@ public class EnhancedDijkstraAlgorithm {
         LinkedList<Direction> reversalPath = new LinkedList<>();
 
         for (Direction direction : directions) {
+            if (!checkIfDirectionValid(current.rail(), current.point(), direction.rail())) {
+                continue;
+            }
+
             reversalPath.clear();
             if (distance + direction.rail().length() >= length) {
                 reversalPath.add(direction);
@@ -113,6 +117,10 @@ public class EnhancedDijkstraAlgorithm {
         Collections.reverse(directions);
 
         for (Direction direction : directions) {
+            if (!checkIfDirectionValid(current.rail(), current.point(), direction.rail())) {
+                continue;
+            }
+
             if (checkIfDirectionVisited(reversalPath, direction)) {
                 continue;
             }
