@@ -1,2 +1,0 @@
-Vertex a Edge by neměli být viditelný a použitelný mimo Graph
-UI: základní jenom s přidáváním hran a vrcholů a zakázaných přesměrování NEBO grafické UI s vizualizací 

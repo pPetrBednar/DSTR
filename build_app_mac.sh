@@ -10,7 +10,7 @@
 # APP_VERSION: the application version, e.g. 1.0.0, shown in "about" dialog
 
 JAVA_VERSION=19
-MAIN_JAR="Palladium-$PROJECT_VERSION.jar"
+MAIN_JAR="DSTR-$PROJECT_VERSION.jar"
 
 # Set desired installer type: "dmg", "pkg".
 INSTALLER_TYPE=pkg
@@ -35,14 +35,8 @@ cp target/lib/* target/installer/input/lib/
 echo "Copying libraries"
 cp app/lib/* target/installer/input/lib/
 
-echo "Copying sql"
-cp app/sql/* target/installer/input/sql/
-
 echo "Copying resources"
 cp app/res/* target/installer/input/res/
-
-echo "Copying manual"
-cp app/man/* target/installer/input/man/
 
 echo "Copying main jar"
 cp target/${MAIN_JAR} target/installer/input/lib/
@@ -59,7 +53,7 @@ detected_modules=`$JAVA_HOME/bin/jdeps \
   --ignore-missing-deps \
   --print-module-deps \
   --class-path "target/installer/input/lib/*" \
-    target/classes/io/github/ppetrbednar/palladium/App.class`
+    target/classes/io/github/ppetrbednar/dstr/App.class`
 echo "Detected modules: ${detected_modules}"
 
 

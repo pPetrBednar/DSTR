@@ -2,6 +2,7 @@ package io.github.ppetrbednar.dstr.ui.module.root;
 
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXTextField;
 import io.github.ppetrbednar.dstr.logic.DSTRController;
 import io.github.ppetrbednar.dstr.logic.RailwayVisualizer;
 import io.github.ppetrbednar.dstr.logic.railway.ui.ActionType;
@@ -52,6 +53,8 @@ public class Main extends Module<Main, Root> {
     private JFXButton removeIllegalTransition;
     @FXML
     private JFXButton simulateBtn;
+    @FXML
+    private JFXTextField modelUID;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -64,6 +67,10 @@ public class Main extends Module<Main, Root> {
         buttons.add(removeRailBtn);
         buttons.add(removeIllegalTransition);
         buttons.add(simulateBtn);
+
+        modelUID.textProperty().addListener((observable, oldValue, newValue) -> {
+            visualizer.changeModelUID(newValue);
+        });
     }
 
     private void selectBtn(JFXButton btn, String style) {
@@ -163,5 +170,9 @@ public class Main extends Module<Main, Root> {
 
     public void compose(ViewType type) {
         compositor.compose(type);
+    }
+
+    public JFXTextField getModelUID() {
+        return modelUID;
     }
 }

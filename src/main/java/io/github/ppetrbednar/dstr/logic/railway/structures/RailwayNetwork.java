@@ -108,7 +108,11 @@ public class RailwayNetwork {
     }
 
     public String getUid() {
-        return uid;
+        return uid.isEmpty() ? "dstr-diagram" : uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public Graph<String, Switch, String, Rail> getNetwork() {

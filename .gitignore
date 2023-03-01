@@ -43,3 +43,4 @@ build/
 
 ### Build ###
 temp.txt
+/test/

@@ -18,6 +18,8 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
@@ -27,7 +29,7 @@ import java.util.HashMap;
 public class RailwayVisualizer {
 
     private final HashMap<String, Node> nodes;
-    private final File save = new File("./diagram.json");
+    private File save;
     private final Main window;
     private AnchorPane pane;
     private final int cellCountWidth = 60;
@@ -48,7 +50,7 @@ public class RailwayVisualizer {
     private final HashMap<String, Tooltip> railTooltips;
 
     public RailwayVisualizer(Main main) {
-        this.railwayNetwork = new RailwayNetwork("Base", new Graph<>());
+        this.railwayNetwork = new RailwayNetwork("", new Graph<>());
         nodes = new HashMap<>();
         this.window = main;
         switchTooltips = new HashMap<>();
@@ -369,13 +371,25 @@ public class RailwayVisualizer {
     }
 
     public void load() {
-        try {
-            railwayNetwork = RailwayNetwork.loadRailwayNetwork(save);
-            clear();
-            printGrid();
-            printRailwayNetwork();
-        } catch (RailwayNetworkLoadException e) {
-            System.out.println("Not loaded");
+
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(window.getCallback().getStage());
+
+        if (file == null) {
+            return;
+        }
+
+        if (file.exists()) {
+            try {
+                railwayNetwork = RailwayNetwork.loadRailwayNetwork(file);
+                clear();
+                printGrid();
+                printRailwayNetwork();
+                save = file;
+                window.getModelUID().setText(railwayNetwork.getUid());
+            } catch (RailwayNetworkLoadException e) {
+                System.out.println("Not loaded");
+            }
         }
     }
 
@@ -398,7 +412,27 @@ public class RailwayVisualizer {
     }
 
     public void save() {
-        RailwayNetwork.saveRailwayNetwork(railwayNetwork, save);
+
+        if (save == null) {
+            DirectoryChooser dirChooser = new DirectoryChooser();
+            File file = dirChooser.showDialog(window.getCallback().getStage());
+
+            if (file == null) {
+                return;
+            }
+
+            if (file.exists() && file.isDirectory()) {
+                RailwayNetwork.saveRailwayNetwork(railwayNetwork, new File(file.getPath() + "/" + railwayNetwork.getUid() + ".json"));
+                save = new File(file.getPath() + "/" + railwayNetwork.getUid() + ".json");
+            }
+        } else {
+            AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "Are you sure you want to save?", true);
+            am.showAndWait(() -> {
+                if ((boolean) am.getResult()) {
+                    RailwayNetwork.saveRailwayNetwork(railwayNetwork, save);
+                }
+            });
+        }
     }
 
     public void simulate(String key) {
@@ -466,5 +500,11 @@ public class RailwayVisualizer {
             printGrid();
             printRailwayNetwork();
         });
+    }
+
+    public void changeModelUID(String uid) {
+        if (railwayNetwork != null) {
+            railwayNetwork.setUid(uid);
+        }
     }
 }

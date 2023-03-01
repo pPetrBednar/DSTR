@@ -24,10 +24,10 @@ public class App extends Application {
 
         ScreenLoader<Root> root = new ScreenLoader<>("Root");
         root.setupRootStage("DSTR", stage);
-        root.setMinSize(800, 400);
+        root.setMinSize(1200, 800);
         root.setPrefSize(1600, 800);
         root.setTransparent(true);
-        root.setResizeable();
+        //root.setResizeable();
 
         stage.getIcons().add(ResourceManager.getImageResource(Resource.APPLICATION_ICON));
 
