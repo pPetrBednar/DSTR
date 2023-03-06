@@ -471,9 +471,10 @@ public class RailwayVisualizer {
         Platform.runLater(() -> {
             path = railwayNetwork.getShortestValidPath(source, target, length);
 
+            /*
             if (path == null) {
                 path = railwayNetwork.getShortestValidPathLegacy(source, target, length);
-            }
+            }*/
 
             if (path == null) {
                 AlertManager am = new AlertManager(AlertManager.AlertType.WARNING, "No valid path found.", false);
